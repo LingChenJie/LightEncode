@@ -1,14 +1,12 @@
 package com.light.encode.tlv;
 
 import com.light.encode.Pair;
-import com.light.encode.ios8583.Iso8583Config;
 import com.light.encode.util.ByteUtil;
+import com.light.encode.util.L;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public final class TLVHelper {
@@ -45,9 +43,9 @@ public final class TLVHelper {
             // create TLV
             TLV tlv = new TLV(tag, length, value);
             map.put(tag, tlv);
-            Logger.getLogger(Iso8583Config.TAG).log(Level.INFO, "|| " + tag + ": " + value);
+            L.i("| " + tag + ": " + value);
         }
-        Logger.getLogger(Iso8583Config.TAG).log(Level.INFO, "===========================TLV-Decode-End===========================");
+        L.i("===========================TLV-Decode-End===========================");
         return map;
     }
 

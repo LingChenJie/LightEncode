@@ -1,7 +1,6 @@
 package com.light.encode.util;
 
 import com.google.gson.Gson;
-import com.light.encode.ios8583.Field;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,7 +19,7 @@ public final class CloneUtil {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    public static <T extends Serializable> T deepClone(final Map<String, Field> src) throws Exception {
+    public static <T extends Serializable> Map<String, T> deepClone(final Map<String, T> src) {
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
         try {
@@ -30,14 +29,14 @@ public final class CloneUtil {
             byte[] byteArray = byteOut.toByteArray();
             ByteArrayInputStream byteIn = new ByteArrayInputStream(byteArray);
             in = new ObjectInputStream(byteIn);
-            return (T) in.readObject();
+            return (Map<String, T>) in.readObject();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             close(out);
             close(in);
         }
-        throw new RuntimeException("DeepClone fail");
+        return null;
     }
 
     public static <T> T deepClone(final T data, final Type type) {
@@ -54,10 +53,10 @@ public final class CloneUtil {
     /**
      * 关闭流
      */
-    private static void close(Closeable src) {
-        if (src != null) {
+    private static void close(Closeable closeable) {
+        if (closeable != null) {
             try {
-                src.close();
+                closeable.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

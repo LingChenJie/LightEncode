@@ -1,89 +1,102 @@
 package com.light.encode.ios8583;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.light.encode.ios8583.hide.Iso8583Helper;
-import com.light.encode.util.CloneUtil;
+import android.util.Xml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
+import com.light.encode.util.CloneUtil;
+import com.light.encode.util.CollectionUtil;
+
+import org.xmlpull.v1.XmlPullParser;
+
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class Iso8583Config {
 
-    public static final String TAG = "Iso8583";
+    private static HashMap<String, Field> originFieldMap = new HashMap<>();
 
-    private static HashMap<String, Field> allFieldMap = new HashMap<>();
-
-//    static {
-//        setBitmapFieldConfig(Iso8583Helper.FIELD_CONFIG_128());
-//    }
-
-    public static void setBitmapFieldConfig(File file) {
-        try {
-            FileInputStream inputStream = new FileInputStream(file);
-            int length = inputStream.available();
-            byte[] buffer = new byte[length];
-            inputStream.read(buffer);
-            inputStream.close();
-            String jsonString = new String(buffer, StandardCharsets.UTF_8);
-            setBitmapFieldConfig(jsonString);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void setBitmapConfig(InputStream input) {
+        List<Field> fields = parseBitmap(input);
+        if (fields == null) {
+            throw new RuntimeException("parse bitmap fail.");
         }
+        setBitmapConfig(fields);
     }
 
-    public static void setBitmapFieldConfig(String jsonString) {
-        try {
-            Type type = new TypeToken<List<Field>>() {
-            }.getType();
-            List<Field> list = new Gson().fromJson(jsonString, type);
-            setBitmapFieldConfig(list);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void setBitmapFieldConfig(List<Field> list) {
+    public static void setBitmapConfig(List<Field> list) {
         if (list != null && list.size() > 0) {
             HashMap<String, Field> map = new HashMap<>();
             for (int i = 0; i < list.size(); i++) {
                 Field field = list.get(i);
                 int position = field.getPosition();
-                if (position >= 0 && position <= 128) {
-                    String name = Iso8583Helper.getMessageFieldName(position);
+                if (position >= Constant.Position.MIN && position <= Constant.Position.MAX) {
+                    String name = Helper.getFieldName(position);
                     map.put(name, field);
                 } else {
-                    Logger.getLogger(Iso8583Config.TAG).log(Level.WARNING, "Field [" + i + "] out of configuration range.");
+                    throw new RuntimeException("Field [" + i + "] out of configuration range.");
                 }
             }
-            allFieldMap = map;
+            originFieldMap = map;
         }
     }
 
-    public static Map<String, Field> getBitmapFieldConfig() {
-        if (allFieldMap.size() == 0) {
-            throw new RuntimeException("You must call Iso8583Config.setBitmapXxxConfig method first.");
+    public static Map<String, Field> getFieldMapConfig() {
+        if (CollectionUtil.isEmpty(originFieldMap)) {
+            throw new RuntimeException("You must call Iso8583Config.setBitmapConfig method first.");
         }
         try {
-            return CloneUtil.deepClone(allFieldMap);
+            return CloneUtil.deepClone(originFieldMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new HashMap<>();
     }
 
-    public static Map<String, Field> getOriginBitmapFieldConfig() {
-        if (allFieldMap.size() == 0) {
-            throw new RuntimeException("You must call Iso8583Config.setBitmapXxxConfig method first.");
+    public static Map<String, Field> getOriginFieldMap() {
+        if (CollectionUtil.isEmpty(originFieldMap)) {
+            throw new RuntimeException("You must call Iso8583Config.setBitmapConfig method first.");
         }
-        return allFieldMap;
+        return originFieldMap;
+    }
+
+    private static List<Field> parseBitmap(InputStream input) {
+        try {
+            List<Field> fields = new ArrayList<>();
+            Field field;
+            XmlPullParser parser = Xml.newPullParser();
+            parser.setInput(input, "UTF-8");
+            int eventType = parser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG) {
+                    String tagName = parser.getName();
+                    if (tagName.equals(Constant.Field.FIELD)) {
+                        String position = parser.getAttributeValue(null, Constant.Field.POSITION);
+                        String lengthType = parser.getAttributeValue(null, Constant.Field.LENGTH_TYPE);
+                        String dataLength = parser.getAttributeValue(null, Constant.Field.DATA_LENGTH);
+                        String dataEncode = parser.getAttributeValue(null, Constant.Field.DATA_ENCODE);
+                        String alignType = parser.getAttributeValue(null, Constant.Field.ALIGN_TYPE);
+                        String padding = parser.getAttributeValue(null, Constant.Field.PADDING);
+                        field = new Field.Builder()
+                                .padding(position)
+                                .lengthType(lengthType)
+                                .dataLength(dataLength)
+                                .dataEncode(dataEncode)
+                                .alignType(alignType)
+                                .padding(padding)
+                                .build();
+                        fields.add(field);
+                    }
+                }
+                eventType = parser.next();
+            }
+            input.close();
+            return fields;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

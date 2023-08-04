@@ -6,9 +6,9 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.light.encode.ios8583.Iso8583Config
-import com.light.encode.ios8583.Iso8583
 import com.light.encode.ios8583.Field
+import com.light.encode.ios8583.Iso8583
+import com.light.encode.ios8583.Iso8583Config
 import com.light.encode.tlv.TLVHelper
 import com.light.encode.util.ByteUtil
 import com.light.encode.utils.LogUtil
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             LogUtil.e(TAG, "initIso8583: $string")
             val type = object : TypeToken<List<Field>>() {}.type
             val list = Gson().fromJson<List<Field>>(string, type)
-            Iso8583Config.setBitmapFieldConfig(list)
+            Iso8583Config.setBitmapConfig(list)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                         .dataBytes(ByteUtil.hexString2Bytes("111987654adc")).build()
                 )
                 .addField(64, "2173126461641414")
-                .addTotalLengthLength(0)
+                .addLengthLength(0)
                 .build()
                 .encode()
             var hexString = ByteUtil.bytes2HexString(encode)
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                 .addField(3, "800008")
                 .addField(60, "123456781")
                 .addField(63, "987654adc")
-                .addTotalLengthLength(0)
+                .addLengthLength(0)
                 .hasBitmap(false)
                 .build()
                 .encode()
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             encode =
                 ByteUtil.hexString2Bytes("666666666666666666666608007020000020C00035196228888888812127121080000800000000000111111107123D5610313030303030303132323232323232323232323232323200054142432E4400091234567810000491234567802173126461641414")
             val iso8583 = Iso8583.DecodeBuilder()
-                .addTotalLengthLength(0)
+                .addLengthLength(0)
                 .addHeaderLength(11)
                 .addDataBytes(encode)
                 .build()

@@ -2,8 +2,8 @@
 <!--
 field settings
     1) id(mandatory)
-        0: header
-        1: msg type
+        0: msg type
+        1: bitmap
         2-...: field x
     2) lengthType(mandatory)
         长度类型，默认长度编码格式为BCD
@@ -27,6 +27,6 @@ field settings
         填充内容
 -->
 <iso8583>
-    <field positon="0" lengthType="NONE" dataLength="4" dataEncode="BCD" alignType="RIGHT" padding="0"/><!-- header -->
-    <field positon="1" lengthType="NONE" dataLength="8" dataEncode="BIT" alignType="RIGHT" padding="0"/>
+    <field position="0" lengthType="NONE" dataLength="4" dataEncode="BCD" alignType="RIGHT" padding="0"/>
+    <field position="1" lengthType="NONE" dataLength="8" dataEncode="BIT" alignType="RIGHT" padding="0"/>
 </iso8583>

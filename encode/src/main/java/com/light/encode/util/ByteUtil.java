@@ -149,11 +149,12 @@ public final class ByteUtil {
      * 字节数组转换为二进制数组
      */
     public static boolean[] bytes2BinaryBytes(final byte[] bytes) {
-        String string = "";
+        StringBuilder builder = new StringBuilder();
         boolean[] booleans = new boolean[bytes.length * 8 + 1];
         for (byte value : bytes) {
-            string += getBinaryLengthStringByByte(value);
+            builder.append(getBinaryLengthStringByByte(value));
         }
+        String string = builder.toString();
         for (int i = 0; i < string.length(); i++) {
             boolean bool = string.substring(i, i + 1).equalsIgnoreCase("1");
             booleans[i + 1] = bool;

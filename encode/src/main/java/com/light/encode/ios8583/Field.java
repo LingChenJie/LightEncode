@@ -1,8 +1,5 @@
 package com.light.encode.ios8583;
 
-import com.light.encode.ios8583.hide.BitmapHelper;
-import com.light.encode.ios8583.hide.Iso8583Helper;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +10,7 @@ public final class Field implements Serializable, Cloneable {
 
     /**
      * which domain, value: 1- 128
+     * {@link Constant.Position}
      */
     private int position;
 
@@ -24,17 +22,20 @@ public final class Field implements Serializable, Cloneable {
     /**
      * data alignment type
      * use for const length filed: RIGHT  LEFT (主要定长域使用) 左右靠
+     * {@link Constant.AlignType}
      */
     private String alignType;
 
     /**
      * whether the data length is variable, value: NONE / PAIR / TRIPE
      * data type of length: ASC / HEX / BCD (default) (只有变长域才存在)  - ASC HEX BCD(不填则默认BCD)
+     * {@link Constant.LengthType}
      */
     private String lengthType;
 
     /**
      * data length type, BCD / ASCII
+     * {@link Constant.EncodeType}
      */
     private String lengthEncode;
 
@@ -53,6 +54,7 @@ public final class Field implements Serializable, Cloneable {
      * BCD: num in right, append 0 left 数值, 右靠, 首位有效数字前填充零。若表示金额, 则最右两位表示角分(在国内使用, 默认压缩为BCD码, 所以处理上和Z相同)
      * ASC: character in left, append blank right(A, AN, ANS, AS) 字母, 数字和/或特殊符号, 左靠, 右部多余部分填空格, 包括 A, AN, ANS, AS
      * BIT: hex 格式, 原始数据
+     * {@link Constant.EncodeType}
      */
     private String dataEncode;
 
@@ -78,11 +80,11 @@ public final class Field implements Serializable, Cloneable {
     public int getAlignType() {
         switch (alignType) {
             case Constant.AlignType.LEFT:
-                return Iso8583Helper.ISO_8583_ALIGN_LEFT;
+                return Helper.ALIGN_LEFT;
             case Constant.AlignType.RIGHT:
-                return Iso8583Helper.ISO_8583_ALIGN_RIGHT;
+                return Helper.ALIGN_RIGHT;
         }
-        return Iso8583Helper.ISO_8583_ALIGN_LEFT;
+        return Helper.ALIGN_LEFT;
     }
 
     public void setAlignType(String alignType) {
@@ -92,13 +94,13 @@ public final class Field implements Serializable, Cloneable {
     public int getLengthType() {
         switch (lengthType) {
             case Constant.LengthType.NONE:
-                return Iso8583Helper.ISO_8583_LEN_VAR_NONE;
+                return Helper.LENGTH_VAR_NONE;
             case Constant.LengthType.PAIR:
-                return Iso8583Helper.ISO_8583_LEN_VAR_PAIR;
+                return Helper.LENGTH_VAR_PAIR;
             case Constant.LengthType.TRIP:
-                return Iso8583Helper.ISO_8583_LEN_VAR_TRIP;
+                return Helper.LENGTH_VAR_TRIP;
         }
-        return Iso8583Helper.ISO_8583_LEN_VAR_NONE;
+        return Helper.LENGTH_VAR_NONE;
     }
 
     public void setLengthType(String lengthType) {
@@ -107,14 +109,14 @@ public final class Field implements Serializable, Cloneable {
 
     public int getDataEncode() {
         switch (dataEncode) {
-            case Constant.DataEncode.BCD:
-                return Iso8583Helper.ISO_8583_DATA_ENCODE_BCD;
-            case Constant.DataEncode.BIT:
-                return Iso8583Helper.ISO_8583_DATA_ENCODE_BIT;
-            case Constant.DataEncode.ASC:
-                return Iso8583Helper.ISO_8583_DATA_ENCODE_ASC;
+            case Constant.EncodeType.BCD:
+                return Helper.ENCODE_BCD;
+            case Constant.EncodeType.BIT:
+                return Helper.ENCODE_BIT;
+            case Constant.EncodeType.ASC:
+                return Helper.ENCODE_ASC;
         }
-        return Iso8583Helper.ISO_8583_DATA_ENCODE_BCD;
+        return Helper.ENCODE_BCD;
     }
 
     public void setDataEncode(String dataEncode) {
@@ -137,12 +139,12 @@ public final class Field implements Serializable, Cloneable {
         this.dataBytes = dataBytes;
         int lengthType = getLengthType();
         int dataEncode = getDataEncode();
-        if (lengthType > Iso8583Helper.ISO_8583_LEN_VAR_NONE && dataBytes != null) {
-            if (dataEncode == Iso8583Helper.ISO_8583_DATA_ENCODE_BCD) {
+        if (lengthType > Helper.LENGTH_VAR_NONE && dataBytes != null) {
+            if (dataEncode == Helper.ENCODE_BCD) {
                 setDataLength(dataBytes.length * 2);
-            } else if (dataEncode == Iso8583Helper.ISO_8583_DATA_ENCODE_BIT) {
+            } else if (dataEncode == Helper.ENCODE_BIT) {
                 setDataLength(dataBytes.length * 2);
-            } else if (dataEncode == Iso8583Helper.ISO_8583_DATA_ENCODE_ASC) {
+            } else if (dataEncode == Helper.ENCODE_ASC) {
                 setDataLength(dataBytes.length);
             }
         }
@@ -155,7 +157,7 @@ public final class Field implements Serializable, Cloneable {
     public void setDataString(String dataString) {
         this.dataString = dataString;
         int lengthType = getLengthType();
-        if (lengthType > Iso8583Helper.ISO_8583_LEN_VAR_NONE && dataString != null) {
+        if (lengthType > Helper.LENGTH_VAR_NONE && dataString != null) {
             int length = dataString.length();
             setDataLength(length);
         }
@@ -204,6 +206,11 @@ public final class Field implements Serializable, Cloneable {
             return this;
         }
 
+        public Builder dataLength(String dataLength) {
+            map.put(Constant.Field.DATA_LENGTH, dataLength);
+            return this;
+        }
+
         public Builder dataBytes(byte[] dataBytes) {
             map.put(Constant.Field.DATA_BYTES, dataBytes);
             return this;
@@ -219,8 +226,8 @@ public final class Field implements Serializable, Cloneable {
             Object object = map.get(Constant.Field.POSITION);
             if (object != null) {
                 int position = (int) object;
-                String name = Iso8583Helper.getMessageFieldName(position);
-                Field field = BitmapHelper.getMessageFieldClone(name);
+                String fieldName = Helper.getFieldName(position);
+                Field field = Helper.getFieldClone(fieldName);
                 if (field != null) {
                     messageField = field;
                 } else {

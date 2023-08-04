@@ -2,6 +2,11 @@ package com.light.encode.ios8583;
 
 class Constant {
 
+    public static class Position {
+        public static final int MIN = 0;
+        public static final int MAX = 128;
+    }
+
     public static class AlignType {
         public static final String LEFT = "LEFT";
         public static final String RIGHT = "RIGHT";
@@ -13,13 +18,14 @@ class Constant {
         public static final String TRIP = "TRIP";
     }
 
-    public static class DataEncode {
+    public static class EncodeType {
         public static final String BCD = "BCD";
         public static final String BIT = "BIT";
         public static final String ASC = "ASC";
     }
 
     public static class Field {
+        public static final String FIELD = "field";
         public static final String POSITION = "position";
         public static final String LENGTH_TYPE = "lengthType";
         public static final String PADDING = "padding";
