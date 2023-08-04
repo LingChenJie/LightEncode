@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+field settings
+    1) id(mandatory)
+        0: header
+        1: msg type
+        2-...: field x
+    2) lengthType(mandatory)
+        长度类型，默认长度编码格式为BCD
+        BCD:
+            NONE: 固定数据大小，没有长度位
+            PAIR: 0-99，占1字节长度位
+            TRIP: 0-999，占2字节长度位
+        ASC:
+            NONE: 固定数据大小，没有长度位
+            PAIR: 0-99，占2字节长度位
+            TRIP: 0-999，占3字节长度位
+    3) lengthEncode(option)
+        长度编码，默认为BCD
+    4) dataLength(mandatory)
+        数据长度
+    5) dataEncode(mandatory)
+        数据编码
+    6) alignType(option)
+        数据对齐方式
+    7) padding(option)
+        填充内容
+-->
+<iso8583>
+    <field positon="0" lengthType="NONE" dataLength="4" dataEncode="BCD" alignType="RIGHT" padding="0"/><!-- header -->
+    <field positon="1" lengthType="NONE" dataLength="8" dataEncode="BIT" alignType="RIGHT" padding="0"/>
+</iso8583>
