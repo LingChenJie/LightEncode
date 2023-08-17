@@ -4,15 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.light.encode.ios8583.Field
 import com.light.encode.ios8583.Iso8583
 import com.light.encode.ios8583.Iso8583Config
 import com.light.encode.tlv.TLVHelper
 import com.light.encode.util.ByteUtil
 import com.light.encode.utils.LogUtil
-import java.nio.charset.StandardCharsets
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,7 +64,11 @@ class MainActivity : AppCompatActivity() {
                 .addField(35, "123D561")
                 .addField(41, "10000001")
                 .addField(42, "222222222222222")
-//                .addField( MessageField.Builder().position(22).dataBytes( byteArrayOf(33, 34) ).build() )
+                .addField(
+                    Field.Builder().position(22)
+                        .dataBytes(byteArrayOf(1, 2))
+                        .build()
+                )
                 .addField(
                     Field.Builder().position(52)
                         .dataString("31323334353637383132333435363738")
@@ -76,11 +77,11 @@ class MainActivity : AppCompatActivity() {
                 )
                 .addField(59, "ABC.D")
                 .addField(60, "123456781")
-                .addField(62, "912345678")
-//                .addField(
-//                    Field.Builder().position(62)
-//                        .dataBytes(ByteUtil.hexString2Bytes("111987654adc")).build()
-//                )
+//                .addField(62, "912345678")
+                .addField(
+                    Field.Builder().position(62)
+                        .dataBytes(ByteUtil.hexString2Bytes("111987654adc")).build()
+                )
                 .addField(64, "2173126461641414")
                 .addLengthLength(0)
                 .build()
