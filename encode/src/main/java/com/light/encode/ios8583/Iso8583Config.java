@@ -20,7 +20,7 @@ public final class Iso8583Config {
     public static void setBitmapConfig(InputStream input) {
         List<Field> fields = parseBitmap(input);
         if (fields == null) {
-            throw new RuntimeException("parse bitmap fail.");
+            throw new RuntimeException("parse ISO8583 bitmap fail.");
         }
         setBitmapConfig(fields);
     }
@@ -55,9 +55,6 @@ public final class Iso8583Config {
     }
 
     public static Map<String, Field> getOriginFieldMap() {
-        if (CollectionUtil.isEmpty(originFieldMap)) {
-            throw new RuntimeException("You must call Iso8583Config.setBitmapConfig method first.");
-        }
         return originFieldMap;
     }
 
@@ -79,9 +76,9 @@ public final class Iso8583Config {
                         String alignType = parser.getAttributeValue(null, Constant.Field.ALIGN_TYPE);
                         String padding = parser.getAttributeValue(null, Constant.Field.PADDING);
                         field = new Field.Builder()
-                                .padding(position)
+                                .position(Integer.parseInt(position))
                                 .lengthType(lengthType)
-                                .dataLength(dataLength)
+                                .dataLength(Integer.parseInt(dataLength))
                                 .dataEncode(dataEncode)
                                 .alignType(alignType)
                                 .padding(padding)

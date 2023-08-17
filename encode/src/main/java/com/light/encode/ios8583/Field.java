@@ -206,11 +206,6 @@ public final class Field implements Serializable, Cloneable {
             return this;
         }
 
-        public Builder dataLength(String dataLength) {
-            map.put(Constant.Field.DATA_LENGTH, dataLength);
-            return this;
-        }
-
         public Builder dataBytes(byte[] dataBytes) {
             map.put(Constant.Field.DATA_BYTES, dataBytes);
             return this;
@@ -222,54 +217,54 @@ public final class Field implements Serializable, Cloneable {
         }
 
         public Field build() {
-            Field messageField = new Field();
+            Field field = new Field();
             Object object = map.get(Constant.Field.POSITION);
             if (object != null) {
                 int position = (int) object;
                 String fieldName = Helper.getFieldName(position);
-                Field field = Helper.getFieldClone(fieldName);
-                if (field != null) {
-                    messageField = field;
+                Field clone = Helper.getFieldClone(fieldName);
+                if (clone != null) {
+                    field = clone;
                 } else {
-                    messageField.setPosition(position);
+                    field.setPosition(position);
                 }
             }
             object = map.get(Constant.Field.DATA_BYTES);
             if (object != null) {
                 byte[] dataBytes = (byte[]) object;
-                messageField.setDataBytes(dataBytes);
+                field.setDataBytes(dataBytes);
             }
             object = map.get(Constant.Field.DATA_STRING);
             if (object != null) {
                 String dataString = (String) object;
-                messageField.setDataString(dataString);
+                field.setDataString(dataString);
             }
             object = map.get(Constant.Field.DATA_LENGTH);
             if (object != null) {
                 int dataLength = (int) object;
-                messageField.setDataLength(dataLength);
+                field.setDataLength(dataLength);
             }
             object = map.get(Constant.Field.DATA_ENCODE);
             if (object != null) {
                 String dataEncode = (String) object;
-                messageField.setDataEncode(dataEncode);
+                field.setDataEncode(dataEncode);
             }
             object = map.get(Constant.Field.PADDING);
             if (object != null) {
                 String padding = (String) object;
-                messageField.setPadding(padding);
+                field.setPadding(padding);
             }
             object = map.get(Constant.Field.ALIGN_TYPE);
             if (object != null) {
                 String alignType = (String) object;
-                messageField.setAlignType(alignType);
+                field.setAlignType(alignType);
             }
             object = map.get(Constant.Field.LENGTH_TYPE);
             if (object != null) {
                 String lengthType = (String) object;
-                messageField.setLengthType(lengthType);
+                field.setLengthType(lengthType);
             }
-            return messageField;
+            return field;
         }
 
     }

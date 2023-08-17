@@ -38,20 +38,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initIso8583() {
-        try {
-            val inputStream = assets.open("bitmap_config.json")
-            val length = inputStream.available()
-            val buffer = ByteArray(length)
-            inputStream.read(buffer)
-            inputStream.close()
-            val string = String(buffer, StandardCharsets.UTF_8)
-            LogUtil.e(TAG, "initIso8583: $string")
-            val type = object : TypeToken<List<Field>>() {}.type
-            val list = Gson().fromJson<List<Field>>(string, type)
-            Iso8583Config.setBitmapConfig(list)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+//        try {
+//            val inputStream = assets.open("bitmap_config.json")
+//            val length = inputStream.available()
+//            val buffer = ByteArray(length)
+//            inputStream.read(buffer)
+//            inputStream.close()
+//            val string = String(buffer, StandardCharsets.UTF_8)
+//            LogUtil.e(TAG, "initIso8583: $string")
+//            val type = object : TypeToken<List<Field>>() {}.type
+//            val list = Gson().fromJson<List<Field>>(string, type)
+//            Iso8583Config.setBitmapConfig(list)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+        Iso8583Config.setBitmapConfig(assets.open("bitmap.xml"))
     }
 
     private fun iso8583() {
@@ -75,11 +76,11 @@ class MainActivity : AppCompatActivity() {
                 )
                 .addField(59, "ABC.D")
                 .addField(60, "123456781")
-//                .addField(62, "912345678")
-                .addField(
-                    Field.Builder().position(62)
-                        .dataBytes(ByteUtil.hexString2Bytes("111987654adc")).build()
-                )
+                .addField(62, "912345678")
+//                .addField(
+//                    Field.Builder().position(62)
+//                        .dataBytes(ByteUtil.hexString2Bytes("111987654adc")).build()
+//                )
                 .addField(64, "2173126461641414")
                 .addLengthLength(0)
                 .build()
