@@ -1,5 +1,6 @@
 package com.light.encode.ios8583;
 
+import com.android.architecture.utils.LogUtils;
 import com.light.encode.util.ByteUtil;
 import com.light.encode.util.L;
 
@@ -12,16 +13,16 @@ final class Iso8583Encode {
     public static byte[] encode(Map<String, Field> map, int lengthLength, byte[] header, byte[] msgType, boolean hasBitmap) throws Exception {
         TreeMap<String, Field> fieldMap = new TreeMap<>(map);
 
-        L.i("----------------------------------------------------------------");
-        L.i("-----------------IOS8583 encode start---------------------------");
-        L.i("----------------------------------------------------------------");
+        LogUtils.i(L.TAG,"----------------------------------------------------------------");
+        LogUtils.i(L.TAG,"-----------------IOS8583 encode start---------------------------");
+        LogUtils.i(L.TAG,"----------------------------------------------------------------");
 
         // header
         int headerLength = 0;
         if (header != null && header.length > 0) {
             headerLength = header.length;
             String hexString = ByteUtil.bytes2HexString(header);
-            L.i("| Header: " + hexString);
+            LogUtils.i(L.TAG,"| Header: " + hexString);
         }
 
         // msg type
@@ -29,7 +30,7 @@ final class Iso8583Encode {
         if (msgType != null && msgType.length > 0) {
             msgTypeLength = msgType.length;
             String hexString = ByteUtil.bytes2HexString(msgType);
-            L.i("| MsgType: " + hexString);
+            LogUtils.i(L.TAG,"| MsgType: " + hexString);
         }
 
         // calculate all field data and data length
@@ -185,9 +186,9 @@ final class Iso8583Encode {
             }
             // print logs
             if (variableLengthString.length() > 0) {
-                L.i("| [" + fieldName + "]: [" + variableLengthString + "] " + dataString);
+                LogUtils.i(L.TAG,"| [" + fieldName + "]: [" + variableLengthString + "] " + dataString);
             } else {
-                L.i("| [" + fieldName + "]: [" + fieldDataLength + "] " + dataString);
+                LogUtils.i(L.TAG,"| [" + fieldName + "]: [" + fieldDataLength + "] " + dataString);
             }
             next = entryIterator.hasNext();
         }
@@ -197,7 +198,7 @@ final class Iso8583Encode {
             byte[] bitmapBytes = ByteUtil.binaryBytes2Bytes(bitmapBinaryBytes);
             System.arraycopy(bitmapBytes, 0, content, lengthLength + headerLength + msgTypeLength, bitmapBytes.length);
             String bitmapString = ByteUtil.bytes2HexString(bitmapBytes);
-            L.i("| Bitmap: " + bitmapString);
+            LogUtils.i(L.TAG,"| Bitmap: " + bitmapString);
         }
 
         // length length
@@ -217,12 +218,12 @@ final class Iso8583Encode {
             System.arraycopy(totalLengthLengthBytes, 0, content, 0, totalLengthLengthBytes.length);
             String lengthString = ByteUtil.bytes2HexString(totalLengthLengthBytes);
             int length = Integer.parseInt(lengthString, 16);
-            L.i("| Length: " + lengthString + " (" + length + ")");
+            LogUtils.i(L.TAG,"| Length: " + lengthString + " (" + length + ")");
         }
 
-        L.i("----------------------------------------------------------------");
-        L.i("-----------------IOS8583 encode end-----------------------------");
-        L.i("----------------------------------------------------------------");
+        LogUtils.i(L.TAG,"----------------------------------------------------------------");
+        LogUtils.i(L.TAG,"-----------------IOS8583 encode end-----------------------------");
+        LogUtils.i(L.TAG,"----------------------------------------------------------------");
         return content;
     }
 

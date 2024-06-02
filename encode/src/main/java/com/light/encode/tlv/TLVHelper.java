@@ -1,5 +1,6 @@
 package com.light.encode.tlv;
 
+import com.android.architecture.utils.LogUtils;
 import com.light.encode.Pair;
 import com.light.encode.util.ByteUtil;
 import com.light.encode.util.L;
@@ -43,9 +44,9 @@ public final class TLVHelper {
             // create TLV
             TLV tlv = new TLV(tag, length, value);
             map.put(tag, tlv);
-            L.i("| " + tag + ": " + value);
+            //LogUtils.i(L.TAG,"| " + tag + ": " + value);
         }
-        L.i("===========================TLV-Decode-End===========================");
+        LogUtils.i(L.TAG,"===========================TLV-Decode-End===========================");
         return map;
     }
 

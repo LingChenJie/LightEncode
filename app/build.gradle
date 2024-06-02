@@ -34,13 +34,8 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
+    implementation 'com.github.LingChenJie:LightArchitecture:1.1.10'
     implementation project(':encode')
-    implementation 'com.google.code.gson:gson:2.10.1'
 
     // ShapeView：https://github.com/getActivity/ShapeView
     implementation 'com.github.getActivity:ShapeView:9.0'

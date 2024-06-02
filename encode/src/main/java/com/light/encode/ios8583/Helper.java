@@ -1,5 +1,6 @@
 package com.light.encode.ios8583;
 
+import com.android.architecture.utils.LogUtils;
 import com.light.encode.util.ByteUtil;
 import com.light.encode.util.L;
 
@@ -59,7 +60,7 @@ class Helper {
                 if (field != null) {
                     map.put(name, field);
                 } else {
-                    L.w("Field [" + position + "] not configured.");
+                    LogUtils.w(L.TAG,"Field [" + position + "] not configured.");
                 }
             }
         }
