@@ -12,7 +12,7 @@ static def buildDate() {
 
 android {
     namespace 'com.light.encode'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
