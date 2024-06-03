@@ -70,6 +70,7 @@ public final class Iso8583Config {
                     String tagName = parser.getName();
                     if (tagName.equals(Constant.Field.FIELD)) {
                         String position = parser.getAttributeValue(null, Constant.Field.POSITION);
+                        String lengthEncode = parser.getAttributeValue(null, Constant.Field.LENGTH_ENCODE);
                         String lengthType = parser.getAttributeValue(null, Constant.Field.LENGTH_TYPE);
                         String dataLength = parser.getAttributeValue(null, Constant.Field.DATA_LENGTH);
                         String dataEncode = parser.getAttributeValue(null, Constant.Field.DATA_ENCODE);
@@ -77,6 +78,7 @@ public final class Iso8583Config {
                         String padding = parser.getAttributeValue(null, Constant.Field.PADDING);
                         field = new Field.Builder()
                                 .position(Integer.parseInt(position))
+                                .lengthEncode(lengthEncode)
                                 .lengthType(lengthType)
                                 .dataLength(Integer.parseInt(dataLength))
                                 .dataEncode(dataEncode)

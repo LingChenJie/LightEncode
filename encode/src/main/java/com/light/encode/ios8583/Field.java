@@ -107,6 +107,22 @@ public final class Field implements Serializable, Cloneable {
         this.lengthType = lengthType;
     }
 
+    public void setLengthEncode(String lengthEncode) {
+        this.lengthEncode = lengthEncode;
+    }
+
+    public int getLengthEncode() {
+        switch (lengthEncode) {
+            case Constant.EncodeType.BCD:
+                return Helper.ENCODE_BCD;
+            case Constant.EncodeType.BIT:
+                return Helper.ENCODE_BIT;
+            case Constant.EncodeType.ASC:
+                return Helper.ENCODE_ASC;
+        }
+        return Helper.ENCODE_BCD;
+    }
+
     public int getDataEncode() {
         switch (dataEncode) {
             case Constant.EncodeType.BCD:
@@ -191,6 +207,11 @@ public final class Field implements Serializable, Cloneable {
             return this;
         }
 
+        public Builder lengthEncode(String lengthType) {
+            map.put(Constant.Field.LENGTH_ENCODE, lengthType);
+            return this;
+        }
+
         public Builder lengthType(String lengthType) {
             map.put(Constant.Field.LENGTH_TYPE, lengthType);
             return this;
@@ -263,6 +284,11 @@ public final class Field implements Serializable, Cloneable {
             if (object != null) {
                 String lengthType = (String) object;
                 field.setLengthType(lengthType);
+            }
+            object = map.get(Constant.Field.LENGTH_ENCODE);
+            if (object != null) {
+                String lengthEncode = (String) object;
+                field.setLengthEncode(lengthEncode);
             }
             return field;
         }

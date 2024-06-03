@@ -27,6 +27,7 @@ class Constant {
     public static class Field {
         public static final String FIELD = "field";
         public static final String POSITION = "position";
+        public static final String LENGTH_ENCODE = "lengthEncode";
         public static final String LENGTH_TYPE = "lengthType";
         public static final String PADDING = "padding";
         public static final String ALIGN_TYPE = "alignType";

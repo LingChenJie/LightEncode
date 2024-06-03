@@ -44,6 +44,7 @@ final class Iso8583Encode {
             int fieldPosition = field.getPosition();
             int fieldDataEncode = field.getDataEncode();
             int fieldLengthType = field.getLengthType();
+            int fieldLengthEncode = field.getLengthEncode();
             int fieldDataLength = field.getDataLength();
             // ignore bitmap field
             if (fieldPosition == 1) {
@@ -57,11 +58,41 @@ final class Iso8583Encode {
             int bytesDataLength = 0;
             if (fieldLengthType > Helper.LENGTH_VAR_NONE) {// 变长
                 if (fieldDataEncode == Helper.ENCODE_BCD) {
-                    bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                    switch (fieldLengthEncode) {// 长度的 ASC编码长度 是 BCD编码长度 的2倍
+                        case  Helper.ENCODE_BCD:
+                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            break;
+                        case Helper.ENCODE_BIT:
+                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            break;
+                        case Helper.ENCODE_ASC:
+                            bytesDataLength = (fieldLengthType + 1) / 2 * 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            break;
+                    }
                 } else if (fieldDataEncode == Helper.ENCODE_BIT) {
-                    bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                    switch (fieldLengthEncode) {// 长度的 ASC编码长度 是 BCD编码长度 的2倍
+                        case  Helper.ENCODE_BCD:
+                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            break;
+                        case Helper.ENCODE_BIT:
+                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            break;
+                        case Helper.ENCODE_ASC:
+                            bytesDataLength = (fieldLengthType + 1) / 2 * 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            break;
+                    }
                 } else if (fieldDataEncode == Helper.ENCODE_ASC) {
-                    bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength;
+                    switch (fieldLengthEncode) {// 长度的 ASC编码长度 是 BCD编码长度 的2倍
+                        case  Helper.ENCODE_BCD:
+                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength;
+                            break;
+                        case Helper.ENCODE_BIT:
+                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength;
+                            break;
+                        case Helper.ENCODE_ASC:
+                            bytesDataLength = (fieldLengthType + 1) / 2 * 2 + fieldDataLength;
+                            break;
+                    }
                 }
             } else {// 定长
                 if (fieldDataEncode == Helper.ENCODE_BCD) {
