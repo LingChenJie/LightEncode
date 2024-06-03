@@ -73,7 +73,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     <!-- 52 - PIN BLOCK (ENCRYPTED) -->
     <field position="52" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
     <!-- 53 - COMMUNICATION KEY -->
-    <field position="53" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="53" lengthEncode="ASC"  lengthType="PAIR" dataLength="99"  dataEncode="BIT" alignType="LEFT" padding="0"/>
     <!-- 55 - EMV DATA -->
     <field position="55" lengthEncode="ASC"  lengthType="TRIP" dataLength="255" dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 62 - CUSTOMER DEFINED RESPONSE -->

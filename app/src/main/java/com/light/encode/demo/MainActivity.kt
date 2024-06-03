@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+        findViewById<Button>(R.id.mac).setOnClickListener { mac() }
         findViewById<Button>(R.id.logon).setOnClickListener { logon() }
     }
 
@@ -48,6 +49,41 @@ class MainActivity : AppCompatActivity() {
 //            e.printStackTrace()
 //        }
         Iso8583Config.setBitmapConfig(assets.open("iso8583_example_2.xml"))
+    }
+
+    private fun mac() {
+        // 组包
+        val encodeBuilder = Iso8583.EncodeBuilder()
+            .addHeader("60 01 01 00 00".replace(" ", ""))
+            .addMsgType("0800")
+            .addField(3, "990000")
+            .addField(7, "0721123045")
+            .addField(11, "000010")
+            .addField(24, "815")
+            .addField(41, "60100101")
+            .addField(42, "000000062130003")
+            .build()
+        val encode = encodeBuilder.encode()
+        val encodeHexStr = ByteUtil.bytes2HexString(encode)
+        LogUtil.e(TAG, "encodeHexStr: $encodeHexStr")
+
+        // 解包
+        val response = "00 50 60 00 00 01 01 30 38 31 30 22 20 00 00 0A" +
+                "80 08 00 39 39 30 30 30 30 30 37 32 31 31 32 34" +
+                "34 32 36 30 30 30 30 31 30 30 30 30 30 30 33 37" +
+                "35 35 33 37 30 30 30 30 36 30 31 30 30 31 30 31" +
+                "31 36 2B 67 17 18 0E E0 8C 20 08 15 78 C8 0C AA" +
+                "DC 0C"
+        val decodeHexStr = response.replace(" ", "")
+        val decodeBytes = ByteUtil.hexString2Bytes(decodeHexStr)
+        val decodeBuilder = Iso8583.DecodeBuilder()
+            .addHeaderLength(5)
+            .addDataBytes(decodeBytes)
+            .build()
+        val decode = decodeBuilder.decode()
+        decode.fieldMap.forEach { (position, field) ->
+            LogUtil.e(TAG, "position:$position, value:${field.dataString}")
+        }
     }
 
     private fun logon() {
