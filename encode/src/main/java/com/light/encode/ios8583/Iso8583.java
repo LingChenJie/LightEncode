@@ -14,18 +14,17 @@ public final class Iso8583 implements Serializable {
     private int length;// 报文长度
     private byte[] header;// 报文头
     private String bitmap;// 位图
-    private byte[] msgType;// 消息类型
+    private String msgType;// 消息类型
     private byte[] allFieldData;// 域数据
     private Map<String, Field> fieldMap;// 域集合
 
     private byte[] dataBytes;// 数据
     private int headerLength;// 报文头长度
-    private int msgTypeLength;// 消息类型长度
     private boolean hasBitmap;// 是否有位图
     private int lengthLength;// 报文长度的长度
     private List<Field> fieldConfigList;
 
-    private Iso8583(int length, byte[] header, byte[] msgType, String bitmap, byte[] allFieldData, Map<String, Field> fieldMap) {
+    private Iso8583(int length, byte[] header, String msgType, String bitmap, byte[] allFieldData, Map<String, Field> fieldMap) {
         this.length = length;
         this.header = header;
         this.bitmap = bitmap;
@@ -34,7 +33,7 @@ public final class Iso8583 implements Serializable {
         this.fieldMap = fieldMap;
     }
 
-    private Iso8583(int lengthLength, byte[] header, byte[] msgType, boolean hasBitmap, Map<String, Field> fieldMap) {
+    private Iso8583(int lengthLength, byte[] header, String msgType, boolean hasBitmap, Map<String, Field> fieldMap) {
         this.header = header;
         this.msgType = msgType;
         this.fieldMap = fieldMap;
@@ -42,25 +41,24 @@ public final class Iso8583 implements Serializable {
         this.lengthLength = lengthLength;
     }
 
-    private Iso8583(byte[] dataBytes, int lengthLength, int headerLength, int msgTypeLength, List<Field> fieldConfigList) {
+    private Iso8583(byte[] dataBytes, int lengthLength, int headerLength, List<Field> fieldConfigList) {
         this.dataBytes = dataBytes;
         this.headerLength = headerLength;
-        this.msgTypeLength = msgTypeLength;
         this.fieldConfigList = fieldConfigList;
         this.lengthLength = lengthLength;
     }
 
 
-    public byte[] encode() throws Exception {
-        if (fieldMap == null || fieldMap.size() == 0) {
-            throw new Exception("Data error, fieldMap cannot be null");
+    public byte[] encode() {
+        if (fieldMap == null || fieldMap.isEmpty()) {
+            throw new RuntimeException("Data error, fieldMap cannot be null");
         }
         return Iso8583Encode.encode(fieldMap, lengthLength, header, msgType, hasBitmap);
     }
 
     public Iso8583 decode() {
         Map<String, Field> fieldConfigMap = Helper.getFieldMapConfig();
-        if (fieldConfigList != null && fieldConfigList.size() > 0) {
+        if (fieldConfigList != null && !fieldConfigList.isEmpty()) {
             for (int i = 0; i < fieldConfigList.size(); i++) {
                 Field field = fieldConfigList.get(i);
                 int position = field.getPosition();
@@ -79,7 +77,7 @@ public final class Iso8583 implements Serializable {
         if (dataBytes == null || dataBytes.length == 0) {
             throw new RuntimeException("Data error, dataBytes cannot be null");
         }
-        return Iso8583Decode.decode(dataBytes, lengthLength, headerLength, msgTypeLength, fieldConfigMap);
+        return Iso8583Decode.decode(dataBytes, lengthLength, headerLength, fieldConfigMap);
     }
 
     public static final class Builder {
@@ -87,7 +85,7 @@ public final class Iso8583 implements Serializable {
         private int length;
         private byte[] header;
         private String bitmap;
-        private byte[] msgType;
+        private String msgType;
         private byte[] allFieldData;
         private final Map<String, Field> fieldMap = new HashMap<>();
 
@@ -106,7 +104,7 @@ public final class Iso8583 implements Serializable {
             return this;
         }
 
-        public Builder addMsgType(byte[] bytes) {
+        public Builder addMsgType(String bytes) {
             this.msgType = bytes;
             return this;
         }
@@ -130,7 +128,7 @@ public final class Iso8583 implements Serializable {
     public static final class EncodeBuilder {
 
         private byte[] header;
-        private byte[] msgType;
+        private String msgType;
         private boolean hasBitmap = true;
         private int lengthLength = 2;
         private final Map<String, Field> fieldMap = new HashMap<>();
@@ -145,13 +143,9 @@ public final class Iso8583 implements Serializable {
             return this;
         }
 
-        public EncodeBuilder addMsgType(byte[] bytes) {
-            this.msgType = bytes;
-            return this;
-        }
-
-        public EncodeBuilder addMsgType(String hexString) {
-            this.msgType = ByteUtil.hexString2Bytes(hexString);
+        public EncodeBuilder addMsgType(String value) {
+            this.msgType = value;
+            addField(0, value);
             return this;
         }
 
@@ -199,7 +193,6 @@ public final class Iso8583 implements Serializable {
 
         private byte[] dataBytes;
         private int headerLength = 0;
-        private int messageLength = 2;
         private int lengthLength = 2;
         private List<Field> fieldConfigList;
 
@@ -210,11 +203,6 @@ public final class Iso8583 implements Serializable {
 
         public DecodeBuilder addHeaderLength(int headerLength) {
             this.headerLength = headerLength;
-            return this;
-        }
-
-        public DecodeBuilder addMessageLength(int messageLength) {
-            this.messageLength = messageLength;
             return this;
         }
 
@@ -229,7 +217,7 @@ public final class Iso8583 implements Serializable {
         }
 
         public Iso8583 build() {
-            return new Iso8583(dataBytes, lengthLength, headerLength, messageLength, fieldConfigList);
+            return new Iso8583(dataBytes, lengthLength, headerLength, fieldConfigList);
         }
 
     }
@@ -258,11 +246,11 @@ public final class Iso8583 implements Serializable {
         this.bitmap = bitmap;
     }
 
-    public byte[] getMsgType() {
+    public String getMsgType() {
         return msgType;
     }
 
-    public void setMsgType(byte[] msgType) {
+    public void setMsgType(String msgType) {
         this.msgType = msgType;
     }
 

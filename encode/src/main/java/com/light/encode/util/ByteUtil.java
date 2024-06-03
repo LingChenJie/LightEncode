@@ -243,7 +243,7 @@ public final class ByteUtil {
         return null;
     }
 
-    public static String string2HexString(final String string) {
+    public static String string2HexString(final String string) {//EA70453911E540C46C2CFCCF3290708D46CAF66CB28C15E9
         try {
             Charset charset = Charset.forName("US-ASCII");
             byte[] bytes = string.getBytes(charset);

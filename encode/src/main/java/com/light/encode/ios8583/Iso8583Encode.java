@@ -10,28 +10,24 @@ import java.util.TreeMap;
 
 final class Iso8583Encode {
 
-    public static byte[] encode(Map<String, Field> map, int lengthLength, byte[] header, byte[] msgType, boolean hasBitmap) throws Exception {
+    public static byte[] encode(Map<String, Field> map, int lengthLength, byte[] header, String msgType, boolean hasBitmap) {
         TreeMap<String, Field> fieldMap = new TreeMap<>(map);
 
-        LogUtils.i(L.TAG,"----------------------------------------------------------------");
-        LogUtils.i(L.TAG,"-----------------IOS8583 encode start---------------------------");
-        LogUtils.i(L.TAG,"----------------------------------------------------------------");
+        LogUtils.i(L.TAG, "----------------------------------------------------------------");
+        LogUtils.i(L.TAG, "-----------------IOS8583 encode start---------------------------");
+        LogUtils.i(L.TAG, "----------------------------------------------------------------");
 
         // header
         int headerLength = 0;
         if (header != null && header.length > 0) {
             headerLength = header.length;
             String hexString = ByteUtil.bytes2HexString(header);
-            LogUtils.i(L.TAG,"| Header: " + hexString);
+            LogUtils.i(L.TAG, "| Header: " + hexString);
         }
 
         // msg type
         int msgTypeLength = 0;
-        if (msgType != null && msgType.length > 0) {
-            msgTypeLength = msgType.length;
-            String hexString = ByteUtil.bytes2HexString(msgType);
-            LogUtils.i(L.TAG,"| MsgType: " + hexString);
-        }
+        byte[] msgTypeBytes = new byte[0];
 
         // calculate all field data and data length
         int bodyLength = 0;
@@ -46,8 +42,23 @@ final class Iso8583Encode {
             int fieldLengthType = field.getLengthType();
             int fieldLengthEncode = field.getLengthEncode();
             int fieldDataLength = field.getDataLength();
-            // ignore bitmap field
-            if (fieldPosition == 1) {
+
+            // msg type
+            if (fieldPosition == Constant.Position.MSG_TYPE) {
+                if (msgType != null && !msgType.isEmpty()) {
+                    if (fieldDataEncode == Helper.ENCODE_ASC) {
+                        String msgTypeHex = ByteUtil.string2HexString(msgType);
+                        msgTypeBytes = ByteUtil.hexString2Bytes(msgTypeHex);
+                        LogUtils.i(L.TAG, "| MsgType: " + msgTypeHex + " (" + msgType + ")");
+                    } else {
+                        msgTypeBytes = ByteUtil.hexString2Bytes(msgType);
+                        LogUtils.i(L.TAG, "| MsgType: " + msgType);
+                    }
+                    msgTypeLength = msgTypeBytes.length;
+                }
+            }
+            // ignore msg type field and bitmap field
+            if (fieldPosition == Constant.Position.MSG_TYPE || fieldPosition == Constant.Position.BITMAP) {
                 continue;
             }
             // has 128 bitmap
@@ -58,39 +69,30 @@ final class Iso8583Encode {
             int bytesDataLength = 0;
             if (fieldLengthType > Helper.LENGTH_VAR_NONE) {// 变长
                 if (fieldDataEncode == Helper.ENCODE_BCD) {
-                    switch (fieldLengthEncode) {// 长度的 ASC编码长度 是 BCD编码长度 的2倍
-                        case  Helper.ENCODE_BCD:
-                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
-                            break;
-                        case Helper.ENCODE_BIT:
+                    switch (fieldLengthEncode) {
+                        case Helper.ENCODE_BCD:
                             bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
                             break;
                         case Helper.ENCODE_ASC:
-                            bytesDataLength = (fieldLengthType + 1) / 2 * 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            bytesDataLength = fieldLengthType + fieldDataLength / 2 + fieldDataLength % 2;
                             break;
                     }
                 } else if (fieldDataEncode == Helper.ENCODE_BIT) {
-                    switch (fieldLengthEncode) {// 长度的 ASC编码长度 是 BCD编码长度 的2倍
-                        case  Helper.ENCODE_BCD:
-                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
-                            break;
-                        case Helper.ENCODE_BIT:
+                    switch (fieldLengthEncode) {
+                        case Helper.ENCODE_BCD:
                             bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength / 2 + fieldDataLength % 2;
                             break;
                         case Helper.ENCODE_ASC:
-                            bytesDataLength = (fieldLengthType + 1) / 2 * 2 + fieldDataLength / 2 + fieldDataLength % 2;
+                            bytesDataLength = fieldLengthType + fieldDataLength / 2 + fieldDataLength % 2;
                             break;
                     }
                 } else if (fieldDataEncode == Helper.ENCODE_ASC) {
-                    switch (fieldLengthEncode) {// 长度的 ASC编码长度 是 BCD编码长度 的2倍
-                        case  Helper.ENCODE_BCD:
-                            bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength;
-                            break;
-                        case Helper.ENCODE_BIT:
+                    switch (fieldLengthEncode) {
+                        case Helper.ENCODE_BCD:
                             bytesDataLength = (fieldLengthType + 1) / 2 + fieldDataLength;
                             break;
                         case Helper.ENCODE_ASC:
-                            bytesDataLength = (fieldLengthType + 1) / 2 * 2 + fieldDataLength;
+                            bytesDataLength = fieldLengthType + fieldDataLength;
                             break;
                     }
                 }
@@ -125,7 +127,7 @@ final class Iso8583Encode {
             System.arraycopy(header, 0, content, lengthLength, headerLength);
         }
         if (msgTypeLength > 0) {
-            System.arraycopy(msgType, 0, content, lengthLength + headerLength, msgTypeLength);
+            System.arraycopy(msgTypeBytes, 0, content, lengthLength + headerLength, msgTypeLength);
         }
 
         // body - all field
@@ -149,8 +151,8 @@ final class Iso8583Encode {
             if (hasBitmap) {
                 bitmapBinaryBytes[fieldPosition] = true;
             }
-            // ignore bitmap field
-            if (fieldPosition == 1) {
+            // ignore msg type field and bitmap field
+            if (fieldPosition == Constant.Position.MSG_TYPE || fieldPosition == Constant.Position.BITMAP) {
                 continue;
             }
             // calculate the length of variable length data
@@ -204,7 +206,7 @@ final class Iso8583Encode {
             String dataString;
             byte[] dataBytes = new byte[dataLength];
             dataBytes = addPadding(dataBytes, inputBytes, fieldLengthType, fieldAlignType, fieldPadding);
-            if (fieldDataEncode == Helper.ENCODE_ASC && fieldDataString != null && fieldDataString.length() > 0) {
+            if (fieldDataEncode == Helper.ENCODE_ASC && fieldDataString != null && !fieldDataString.isEmpty()) {
                 dataString = ByteUtil.bytes2HexString(dataBytes) + " (" + fieldDataString + ")";
             } else {
                 dataString = ByteUtil.bytes2HexString(dataBytes);
@@ -216,10 +218,10 @@ final class Iso8583Encode {
                 throw new RuntimeException("Field [" + fieldPosition + "]" + " data error");
             }
             // print logs
-            if (variableLengthString.length() > 0) {
-                LogUtils.i(L.TAG,"| [" + fieldName + "]: [" + variableLengthString + "] " + dataString);
+            if (!variableLengthString.isEmpty()) {
+                LogUtils.i(L.TAG, "| [" + fieldName + "]: [" + variableLengthString + "] " + dataString);
             } else {
-                LogUtils.i(L.TAG,"| [" + fieldName + "]: [" + fieldDataLength + "] " + dataString);
+                LogUtils.i(L.TAG, "| [" + fieldName + "]: [" + fieldDataLength + "] " + dataString);
             }
             next = entryIterator.hasNext();
         }
@@ -229,7 +231,7 @@ final class Iso8583Encode {
             byte[] bitmapBytes = ByteUtil.binaryBytes2Bytes(bitmapBinaryBytes);
             System.arraycopy(bitmapBytes, 0, content, lengthLength + headerLength + msgTypeLength, bitmapBytes.length);
             String bitmapString = ByteUtil.bytes2HexString(bitmapBytes);
-            LogUtils.i(L.TAG,"| Bitmap: " + bitmapString);
+            LogUtils.i(L.TAG, "| Bitmap: " + bitmapString);
         }
 
         // length length
@@ -249,12 +251,12 @@ final class Iso8583Encode {
             System.arraycopy(totalLengthLengthBytes, 0, content, 0, totalLengthLengthBytes.length);
             String lengthString = ByteUtil.bytes2HexString(totalLengthLengthBytes);
             int length = Integer.parseInt(lengthString, 16);
-            LogUtils.i(L.TAG,"| Length: " + lengthString + " (" + length + ")");
+            LogUtils.i(L.TAG, "| Length: " + lengthString + " (" + length + ")");
         }
 
-        LogUtils.i(L.TAG,"----------------------------------------------------------------");
-        LogUtils.i(L.TAG,"-----------------IOS8583 encode end-----------------------------");
-        LogUtils.i(L.TAG,"----------------------------------------------------------------");
+        LogUtils.i(L.TAG, "----------------------------------------------------------------");
+        LogUtils.i(L.TAG, "-----------------IOS8583 encode end-----------------------------");
+        LogUtils.i(L.TAG, "----------------------------------------------------------------");
         return content;
     }
 

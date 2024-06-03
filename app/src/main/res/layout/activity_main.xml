@@ -19,10 +19,17 @@
         android:padding="10dp">
 
         <Button
-            android:id="@+id/iso8583"
+            android:id="@+id/logon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="iso8583" />
+            android:text="logon" />
+
+        <Button
+            android:id="@+id/sale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:text="sale" />
 
     </LinearLayout>
 

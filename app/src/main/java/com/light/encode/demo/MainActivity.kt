@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.light.encode.demo.utils.LogUtil
 import com.light.encode.ios8583.Field
 import com.light.encode.ios8583.Iso8583
 import com.light.encode.ios8583.Iso8583Config
 import com.light.encode.tlv.TLVHelper
 import com.light.encode.util.ByteUtil
-import com.light.encode.demo.utils.LogUtil
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,16 +25,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        findViewById<Button>(R.id.iso8583).setOnClickListener {
-            iso8583()
-        }
+        findViewById<Button>(R.id.logon).setOnClickListener { logon() }
     }
 
     private fun initData() {
-        initIso8583()
+        initIso8583Config()
     }
 
-    private fun initIso8583() {
+    private fun initIso8583Config() {
 //        try {
 //            val inputStream = assets.open("bitmap_config.json")
 //            val length = inputStream.available()
@@ -49,7 +47,43 @@ class MainActivity : AppCompatActivity() {
 //        } catch (e: Exception) {
 //            e.printStackTrace()
 //        }
-        Iso8583Config.setBitmapConfig(assets.open("bitmap.xml"))
+        Iso8583Config.setBitmapConfig(assets.open("iso8583_example_2.xml"))
+    }
+
+    private fun logon() {
+        // 组包
+        val encodeBuilder = Iso8583.EncodeBuilder()
+            .addHeader("60 01 01 00 00".replace(" ", ""))
+            .addMsgType("0800")
+            .addField(3, "990000")
+            .addField(7, "0721123045")
+            .addField(11, "10")
+            .addField(24, "811")
+            .addField(41, "60100101")
+            .addField(42, "000000062130003")
+            .addField(64, "32 92 41 24 9C B3 69 BA".replace(" ", ""))
+            .build()
+        val encode = encodeBuilder.encode()
+        val encodeHexStr = ByteUtil.bytes2HexString(encode)
+        LogUtil.e(TAG, "encodeHexStr: $encodeHexStr")
+
+        // 解包
+        val response = "00 58 60 00 00 01 01 30 38 31 30 22 20 00 00 0A" +
+                "80 08 01 39 39 30 30 30 30 30 37 32 31 31 32 34" +
+                "35 32 32 30 30 30 30 31 31 30 30 30 30 30 33 37" +
+                "35 35 33 37 33 30 30 30 36 30 31 30 30 31 30 31" +
+                "31 36 EA 70 45 39 11 E5 40 C4 6C 2C FC CF 32 90" +
+                "70 8D 46 CA F6 6C B2 8C 15 E9"
+        val decodeHexStr = response.replace(" ", "")
+        val decodeBytes = ByteUtil.hexString2Bytes(decodeHexStr)
+        val decodeBuilder = Iso8583.DecodeBuilder()
+            .addHeaderLength(5)
+            .addDataBytes(decodeBytes)
+            .build()
+        val decode = decodeBuilder.decode()
+        decode.fieldMap.forEach { (position, field) ->
+            LogUtil.e(TAG, "position:$position, value:${field.dataString}")
+        }
     }
 
     private fun iso8583() {

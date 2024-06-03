@@ -5,6 +5,8 @@ class Constant {
     public static class Position {
         public static final int MIN = 0;
         public static final int MAX = 128;
+        public static final int MSG_TYPE = 0;
+        public static final int BITMAP = 1;
     }
 
     public static class AlignType {
