@@ -56,12 +56,18 @@ class MainActivity : AppCompatActivity() {
             .addHeader("60 01 01 00 00".replace(" ", ""))
             .addMsgType("0800")
             .addField(3, "990000")
-            .addField(7, "0721123045")
-            .addField(11, "10")
+            .addField(7, "0721123139")
+            .addField(11, "000010")
             .addField(24, "811")
             .addField(41, "60100101")
             .addField(42, "000000062130003")
-            .addField(64, "32 92 41 24 9C B3 69 BA".replace(" ", ""))
+            .addField(
+                Field.Builder()
+                    .position(64)
+                    .dataString("32 92 41 24 9C B3 69 BA".replace(" ", ""))
+                    .dataLength(8)
+                    .build()
+            )
             .build()
         val encode = encodeBuilder.encode()
         val encodeHexStr = ByteUtil.bytes2HexString(encode)
@@ -69,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
         // 解包
         val response = "00 58 60 00 00 01 01 30 38 31 30 22 20 00 00 0A" +
-                "80 08 01 39 39 30 30 30 30 30 37 32 31 31 32 34" +
+                "80 00 01 39 39 30 30 30 30 30 37 32 31 31 32 34" +
                 "35 32 32 30 30 30 30 31 31 30 30 30 30 30 33 37" +
                 "35 35 33 37 33 30 30 30 36 30 31 30 30 31 30 31" +
                 "31 36 EA 70 45 39 11 E5 40 C4 6C 2C FC CF 32 90" +
@@ -79,6 +85,12 @@ class MainActivity : AppCompatActivity() {
         val decodeBuilder = Iso8583.DecodeBuilder()
             .addHeaderLength(5)
             .addDataBytes(decodeBytes)
+            .addFieldConfig(
+                Field.Builder()
+                    .position(64)
+                    .dataLength(26)
+                    .build()
+            )
             .build()
         val decode = decodeBuilder.decode()
         decode.fieldMap.forEach { (position, field) ->

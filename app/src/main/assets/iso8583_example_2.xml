@@ -37,7 +37,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     <!-- 4 - TRANSACTION AMOUNT -->
     <field position="4"  lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 7 - DATE & TIME, TRANSMISSION -->
-    <field position="7"  lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="7"  lengthEncode="ASC"  lengthType="NONE" dataLength="10"  dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 11 - SYSTEM TRACE NO -->
     <field position="11" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 12 - DATE & TIME, LOCAL TXN -->
@@ -53,7 +53,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     <!-- 35 - TRACK 2 DATA -->
     <field position="35" lengthEncode="ASC"  lengthType="PAIR" dataLength="37"  dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 37 - RETRIEVAL REFERENCE NUMBER -->
-    <field position="37" lengthEncode="ASC"  lengthType="PAIR" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="37" lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 38 - APPROVAL NUMBER -->
     <field position="38" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 39 - RESPONSE CODE -->
@@ -79,7 +79,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     <!-- 62 - CUSTOMER DEFINED RESPONSE -->
     <field position="62" lengthEncode="ASC"  lengthType="TRIP" dataLength="999" dataEncode="ASC" alignType="LEFT" padding="0"/>
     <!-- 64 - PRIMARY MAC DATA -->
-    <field position="64" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
+    <field position="64" lengthEncode="ASC"  lengthType="NONE" dataLength="8"  dataEncode="BIT" alignType="LEFT" padding="0"/>
     <!-- 102 - CARD ACCOUNT NUMBER -->
 <!--    <field position="102" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>-->
     <!-- 128 - SECONDARY MAC DATA -->

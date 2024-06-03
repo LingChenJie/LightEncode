@@ -3,9 +3,11 @@ package com.light.encode.ios8583;
 import com.light.encode.util.ByteUtil;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public final class Iso8583 implements Serializable {
 
@@ -27,25 +29,25 @@ public final class Iso8583 implements Serializable {
     private Iso8583(int length, byte[] header, String msgType, String bitmap, byte[] allFieldData, Map<String, Field> fieldMap) {
         this.length = length;
         this.header = header;
-        this.bitmap = bitmap;
         this.msgType = msgType;
+        this.bitmap = bitmap;
         this.allFieldData = allFieldData;
         this.fieldMap = fieldMap;
     }
 
     private Iso8583(int lengthLength, byte[] header, String msgType, boolean hasBitmap, Map<String, Field> fieldMap) {
+        this.lengthLength = lengthLength;
         this.header = header;
         this.msgType = msgType;
-        this.fieldMap = fieldMap;
         this.hasBitmap = hasBitmap;
-        this.lengthLength = lengthLength;
+        this.fieldMap = fieldMap;
     }
 
     private Iso8583(byte[] dataBytes, int lengthLength, int headerLength, List<Field> fieldConfigList) {
         this.dataBytes = dataBytes;
+        this.lengthLength = lengthLength;
         this.headerLength = headerLength;
         this.fieldConfigList = fieldConfigList;
-        this.lengthLength = lengthLength;
     }
 
 
@@ -194,7 +196,7 @@ public final class Iso8583 implements Serializable {
         private byte[] dataBytes;
         private int headerLength = 0;
         private int lengthLength = 2;
-        private List<Field> fieldConfigList;
+        private List<Field> fieldListConfig;
 
         public DecodeBuilder addDataBytes(byte[] dataBytes) {
             this.dataBytes = dataBytes;
@@ -211,13 +213,24 @@ public final class Iso8583 implements Serializable {
             return this;
         }
 
-        public DecodeBuilder addFieldConfigList(List<Field> fieldConfigList) {
-            this.fieldConfigList = fieldConfigList;
+        public DecodeBuilder addFieldListConfig(List<Field> fieldList) {
+            if (fieldListConfig == null) {
+                fieldListConfig = new ArrayList<>();
+            }
+            this.fieldListConfig.addAll(fieldList);
+            return this;
+        }
+
+        public DecodeBuilder addFieldConfig(Field field) {
+            if (fieldListConfig == null) {
+                fieldListConfig = new ArrayList<>();
+            }
+            fieldListConfig.add(field);
             return this;
         }
 
         public Iso8583 build() {
-            return new Iso8583(dataBytes, lengthLength, headerLength, fieldConfigList);
+            return new Iso8583(dataBytes, lengthLength, headerLength, fieldListConfig);
         }
 
     }
@@ -263,7 +276,7 @@ public final class Iso8583 implements Serializable {
     }
 
     public Map<String, Field> getFieldMap() {
-        return fieldMap;
+        return new TreeMap<>(fieldMap);
     }
 
     public void setFieldMap(Map<String, Field> fieldMap) {
