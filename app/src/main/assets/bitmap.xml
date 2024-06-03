@@ -5,7 +5,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     1) position(mandatory)
         0-128: 数据域所处的位置
     2) lengthEncode(option)
-        长度编码，BCD/ASC
+        长度编码，BCD/ASC，默认为BCD编码
     3) lengthType(mandatory)
         长度类型
             当长度编码为：
@@ -20,7 +20,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     4) dataLength(mandatory)
         数据长度
     5) dataEncode(mandatory)
-        数据编码 BCD/ASC
+        数据编码，BCD/ASC
     6) alignType(option)
         数据对齐方式 LEFT/RIGHT
     7) padding(option)
