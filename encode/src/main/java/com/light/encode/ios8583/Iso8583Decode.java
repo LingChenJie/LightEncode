@@ -143,6 +143,9 @@ class Iso8583Decode {
                 }
                 dataLengthString = String.valueOf(fieldDataLength);
             }
+            if (L.PRINT_DEBUG_MSG) {
+                LogUtils.d(L.TAG, "position:" + position + " dataLength:" + dataLengthString);
+            }
             byte[] fieldDataBytes = new byte[bytesDataLength];
             System.arraycopy(dataBytes, index, fieldDataBytes, 0, bytesDataLength);
             index = index + bytesDataLength;

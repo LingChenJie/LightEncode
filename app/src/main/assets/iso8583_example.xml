@@ -29,19 +29,19 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
 <iso8583>
     <!-- header 这里不用配置，调用 addHeader 添加 -->
     <!-- MESSAGE TYPE ID，调用 addMsgType 添加 -->
-    <field position="0"  lengthType="NONE" dataLength="4"   dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="2"  lengthType="PAIR" dataLength="19"  dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="3"  lengthType="NONE" dataLength="6"   dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="4"  lengthType="NONE" dataLength="12"  dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="11" lengthType="NONE" dataLength="6"   dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="22" lengthType="NONE" dataLength="4"   dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="35" lengthType="PAIR" dataLength="37"  dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="41" lengthType="NONE" dataLength="8"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <field position="42" lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <field position="52" lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
-    <field position="59" lengthType="TRIP" dataLength="255" dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <field position="60" lengthType="TRIP" dataLength="120" dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="62" lengthType="TRIP" dataLength="999" dataEncode="BCD" alignType="LEFT" padding="0"/>
-    <field position="63" lengthType="TRIP" dataLength="255" dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <field position="64" lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
+    <field position="0"   lengthEncode="BCD"  lengthType="NONE" dataLength="4"     dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="2"   lengthEncode="BCD"  lengthType="PAIR" dataLength="19"    dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="3"   lengthEncode="BCD"  lengthType="NONE" dataLength="6"     dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="4"   lengthEncode="BCD"  lengthType="NONE" dataLength="12"    dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="11"  lengthEncode="BCD"  lengthType="NONE" dataLength="6"     dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="22"  lengthEncode="BCD"  lengthType="NONE" dataLength="4"     dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="35"  lengthEncode="BCD"  lengthType="PAIR" dataLength="37"    dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="41"  lengthEncode="BCD"  lengthType="NONE" dataLength="8"     dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="42"  lengthEncode="BCD"  lengthType="NONE" dataLength="15"    dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="52"  lengthEncode="BCD"  lengthType="NONE" dataLength="8"     dataEncode="BIT" alignType="LEFT" padding="0"/>
+    <field position="59"  lengthEncode="BCD"  lengthType="TRIP" dataLength="255"   dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="60"  lengthEncode="BCD"  lengthType="TRIP" dataLength="120"   dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="62"  lengthEncode="BCD"  lengthType="TRIP" dataLength="999"   dataEncode="BCD" alignType="LEFT" padding="0"/>
+    <field position="63"  lengthEncode="BCD"  lengthType="TRIP" dataLength="255"   dataEncode="ASC" alignType="LEFT" padding="0"/>
+    <field position="64"  lengthEncode="BCD"  lengthType="NONE" dataLength="8"     dataEncode="BIT" alignType="LEFT" padding="0"/>
 </iso8583>

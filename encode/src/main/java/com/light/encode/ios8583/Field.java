@@ -163,6 +163,15 @@ public final class Field implements Serializable, Cloneable {
             } else if (dataEncode == Helper.ENCODE_ASC) {
                 setDataLength(dataBytes.length);
             }
+        } else {
+            int length = getDataLength();
+            if (dataEncode == Helper.ENCODE_BCD) {
+                setDataLength(length / 2 + length % 2);
+            } else if (dataEncode == Helper.ENCODE_BIT) {
+                setDataLength(length);
+            } else {
+                setDataLength(length);
+            }
         }
     }
 
@@ -172,10 +181,26 @@ public final class Field implements Serializable, Cloneable {
 
     public void setDataString(String dataString) {
         this.dataString = dataString;
+        int dataEncode = getDataEncode();
         int lengthType = getLengthType();
         if (lengthType > Helper.LENGTH_VAR_NONE && dataString != null) {
             int length = dataString.length();
-            setDataLength(length);
+            if (dataEncode == Helper.ENCODE_BCD) {
+                setDataLength(length / 2 + length % 2);
+            } else if (dataEncode == Helper.ENCODE_BIT) {
+                setDataLength(length / 2 + length % 2);
+            } else {
+                setDataLength(length);
+            }
+        } else {
+            int length = getDataLength();
+            if (dataEncode == Helper.ENCODE_BCD) {
+                setDataLength(length / 2 + length % 2);
+            } else if (dataEncode == Helper.ENCODE_BIT) {
+                setDataLength(length);
+            } else {
+                setDataLength(length);
+            }
         }
     }
 
