@@ -31,6 +31,12 @@
             android:text="logon" />
 
         <Button
+            android:id="@+id/cashout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="cashout" />
+
+        <Button
             android:id="@+id/sale"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         findViewById<Button>(R.id.mac).setOnClickListener { mac() }
         findViewById<Button>(R.id.logon).setOnClickListener { logon() }
+        findViewById<Button>(R.id.cashout).setOnClickListener { cashOut() }
     }
 
     private fun initData() {
@@ -127,6 +128,54 @@ class MainActivity : AppCompatActivity() {
                     .dataLength(26)
                     .build()
             )
+            .build()
+        val decode = decodeBuilder.decode()
+        decode.fieldMap.forEach { (position, field) ->
+            LogUtil.e(TAG, "position:$position, value:${field.dataString}")
+        }
+    }
+
+    private fun cashOut() {
+        // 组包
+        val encodeBuilder = Iso8583.EncodeBuilder()
+            .addHeader("60 01 01 00 00".replace(" ", ""))
+            .addMsgType("0200")
+            .addField(3, "010000")
+            .addField(4, "000000002200")
+            .addField(7, "0721123251")
+            .addField(11, "000012")
+            .addField(12, "19072112351")
+            .addField(24, "200")
+            .addField(25, "00")
+            .addField(35, "4170330361279356D220422000000931")
+            .addField(41, "60100101")
+            .addField(42, "000000062130003")
+            .addField(49, "050")
+            .addField(52, "30 38 43 91 39 CC 5A EF 05 8B".replace(" ", ""))
+            .addField(55, "5F 2A 02 00 50 5F 34 01 01 82 02 3C 00 84 07 A0 00 00 00 03 10 10 95 05 08 80 04 80 00 9A 03 19 07 21 9C 01 00 9F 02 06 00 00 00 00 22 00 9F 09 02 00 8C 9F 10 07 06 01 0A 03 A0 20 00 9F 1A 02 00 50 9F 1E 08 31 37 39 39 37 32 35 37 9F 26 08 FD 4D 21 6C 1E B7 3F 9A 9F 27 01 80 9F 33 03 E0 F0 C8 9F 34 03 42 03 00 9F 35 01 22 9F 36 02 01 57 9F 37 04 2B 28 B1 78".replace(" ", ""))
+            .addField(64, "96 42 4B CA 65 9F 28 9D".replace(" ", ""))
+            .build()
+        val encode = encodeBuilder.encode()
+        val encodeHexStr = ByteUtil.bytes2HexString(encode)
+        LogUtil.e(TAG, "encodeHexStr: $encodeHexStr")
+
+        // 解包
+        val response = "00 A4 60 00 00 01 01 30 32 31 30 F2 30 00 00 0E" +
+                "80 82 01 00 00 00 00 04 00 00 00 31 36 34 31 37" +
+                "30 33 33 30 33 36 31 32 37 39 33 35 36 30 31 30" +
+                "30 30 30 30 30 30 30 30 30 30 30 32 32 30 30 30" +
+                "37 32 31 31 32 34 36 35 36 30 30 30 30 31 32 31" +
+                "39 30 37 32 31 31 32 33 32 35 31 30 30 30 30 30" +
+                "33 37 35 35 33 38 31 30 30 30 30 31 32 30 30 30" +
+                "36 30 31 30 30 31 30 31 30 35 30 00 16 91 0A 12" +
+                "00 80 5B CC B7 60 70 30 30 8A 02 30 30 38 70 AA" +
+                "00 E8 FB B0 39 32 30 35 30 32 31 33 31 30 30 31" +
+                "32 31 33 37 30 37"
+        val decodeHexStr = response.replace(" ", "")
+        val decodeBytes = ByteUtil.hexString2Bytes(decodeHexStr)
+        val decodeBuilder = Iso8583.DecodeBuilder()
+            .addHeaderLength(5)
+            .addDataBytes(decodeBytes)
             .build()
         val decode = decodeBuilder.decode()
         decode.fieldMap.forEach { (position, field) ->
