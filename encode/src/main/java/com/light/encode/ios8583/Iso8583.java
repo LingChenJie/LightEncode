@@ -146,7 +146,6 @@ public final class Iso8583 implements Serializable {
         }
 
         public EncodeBuilder addMsgType(String value) {
-            this.msgType = value;
             addField(0, value);
             return this;
         }
@@ -157,6 +156,9 @@ public final class Iso8583 implements Serializable {
         }
 
         public EncodeBuilder addField(int position, String value) {
+            if (position == 0) {
+                this.msgType = value;
+            }
             String name = Helper.getFieldName(position);
             Field field = Helper.getFieldClone(name);
             if (field != null) {

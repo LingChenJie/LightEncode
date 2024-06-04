@@ -44,9 +44,9 @@ public final class TLVHelper {
             // create TLV
             TLV tlv = new TLV(tag, length, value);
             map.put(tag, tlv);
-            //LogUtils.i(L.TAG,"| " + tag + ": " + value);
+            //LogUtils.d(L.TAG,"| " + tag + ": " + value);
         }
-        LogUtils.i(L.TAG,"===========================TLV-Decode-End===========================");
+        LogUtils.d(L.TAG,"===========================TLV-Decode-End===========================");
         return map;
     }
 

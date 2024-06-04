@@ -14,16 +14,16 @@ final class Iso8583Encode {
     public static byte[] encode(Map<String, Field> map, int lengthLength, byte[] header, String msgType, boolean hasBitmap) {
         TreeMap<String, Field> fieldMap = new TreeMap<>(map);
 
-        LogUtils.i(L.TAG, "----------------------------------------------------------------");
-        LogUtils.i(L.TAG, "-----------------IOS8583 encode start---------------------------");
-        LogUtils.i(L.TAG, "----------------------------------------------------------------");
+        LogUtils.d(L.TAG, "----------------------------------------------------------------");
+        LogUtils.d(L.TAG, "-----------------IOS8583 encode start---------------------------");
+        LogUtils.d(L.TAG, "----------------------------------------------------------------");
 
         // header
         int headerLength = 0;
         if (header != null && header.length > 0) {
             headerLength = header.length;
             String hexString = ByteUtil.bytes2HexString(header);
-            LogUtils.i(L.TAG, "| Header: " + hexString);
+            LogUtils.d(L.TAG, "| Header: " + hexString);
         }
 
         // msg type
@@ -50,10 +50,10 @@ final class Iso8583Encode {
                     if (fieldDataEncode == Helper.ENCODE_ASC) {
                         String msgTypeHex = ByteUtil.string2HexString(msgType);
                         msgTypeBytes = ByteUtil.hexString2Bytes(msgTypeHex);
-                        LogUtils.i(L.TAG, "| MsgType: " + msgTypeHex + " (" + msgType + ")");
+                        LogUtils.d(L.TAG, "| MsgType: " + msgTypeHex + " (" + msgType + ")");
                     } else {
                         msgTypeBytes = ByteUtil.hexString2Bytes(msgType);
-                        LogUtils.i(L.TAG, "| MsgType: " + msgType);
+                        LogUtils.d(L.TAG, "| MsgType: " + msgType);
                     }
                     msgTypeLength = msgTypeBytes.length;
                 }
@@ -135,6 +135,7 @@ final class Iso8583Encode {
             int fieldDataLength = field.getDataLength();
             byte[] fieldDataBytes = field.getDataBytes();
             String fieldDataString = field.getDataString();
+            String desc = field.getDesc();
             // mark each field
             if (hasBitmap) {
                 bitmapBinaryBytes[fieldPosition] = true;
@@ -211,9 +212,9 @@ final class Iso8583Encode {
             }
             // print logs
             if (!variableLengthString.isEmpty()) {
-                LogUtils.i(L.TAG, "| [" + fieldName + "]: [" + variableLengthString + "] " + dataString);
+                LogUtils.d(L.TAG, "| [" + fieldName + "]: [" + variableLengthString + "] " + dataString + "      [" + desc + "]");
             } else {
-                LogUtils.i(L.TAG, "| [" + fieldName + "]: [" + fieldDataLength + "] " + dataString);
+                LogUtils.d(L.TAG, "| [" + fieldName + "]: [" + fieldDataLength + "] " + dataString + "      [" + desc + "]");
             }
             if (L.PRINT_DEBUG_MSG) {
                 LogUtils.d(L.TAG, "end index:" + index);
@@ -226,7 +227,7 @@ final class Iso8583Encode {
             byte[] bitmapBytes = ByteUtil.binaryBytes2Bytes(bitmapBinaryBytes);
             System.arraycopy(bitmapBytes, 0, content, lengthLength + headerLength + msgTypeLength, bitmapBytes.length);
             String bitmapString = ByteUtil.bytes2HexString(bitmapBytes);
-            LogUtils.i(L.TAG, "| Bitmap: " + bitmapString);
+            LogUtils.d(L.TAG, "| Bitmap: " + bitmapString);
         }
 
         // length length
@@ -246,12 +247,12 @@ final class Iso8583Encode {
             System.arraycopy(totalLengthLengthBytes, 0, content, 0, totalLengthLengthBytes.length);
             String lengthString = ByteUtil.bytes2HexString(totalLengthLengthBytes);
             int length = Integer.parseInt(lengthString, 16);
-            LogUtils.i(L.TAG, "| Length: " + lengthString + " (" + length + ")");
+            LogUtils.d(L.TAG, "| Length: " + lengthString + " (" + length + ")");
         }
 
-        LogUtils.i(L.TAG, "----------------------------------------------------------------");
-        LogUtils.i(L.TAG, "-----------------IOS8583 encode end-----------------------------");
-        LogUtils.i(L.TAG, "----------------------------------------------------------------");
+        LogUtils.d(L.TAG, "----------------------------------------------------------------");
+        LogUtils.d(L.TAG, "-----------------IOS8583 encode end-----------------------------");
+        LogUtils.d(L.TAG, "----------------------------------------------------------------");
         return content;
     }
 

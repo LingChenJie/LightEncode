@@ -37,6 +37,7 @@ class Constant {
         public static final String DATA_LENGTH = "dataLength";
         public static final String DATA_BYTES = "dataBytes";
         public static final String DATA_STRING = "dataString";
+        public static final String DESC = "desc";
     }
 
 

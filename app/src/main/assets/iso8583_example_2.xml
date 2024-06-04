@@ -3,7 +3,8 @@
 ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(MTI) + 位图(Bitmap) + 数据域(Data Elements)
 数据域配置(field settings)
     1) position(mandatory)
-        0-128: 数据域所处的位置
+        0: MESSAGE TYPE ID
+        1-128: 数据域所处的位置
     2) lengthEncode(option)
         长度编码，BCD/ASC，默认为BCD
     3) lengthType(mandatory)
@@ -27,67 +28,36 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
         不足部分填充内容
 -->
 <iso8583>
-    <!-- HEADER(包含TPDU) 这里不用配置，调用 addHeader 添加 -->
-    <!-- MESSAGE TYPE ID，调用 addMsgType 添加 -->
-    <field position="0"  lengthEncode="ASC"  lengthType="NONE" dataLength="4"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 2 - PAN -->
-    <field position="2"  lengthEncode="ASC"  lengthType="PAIR" dataLength="19"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 3 - PROCESSING CODE -->
-    <field position="3"  lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 4 - TRANSACTION AMOUNT -->
-    <field position="4"  lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 5 - Amount, Settlement -->
-    <field position="5"  lengthEncode="ASC"  lengthType="NONE" dataLength="13"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 7 - DATE & TIME, TRANSMISSION -->
-    <field position="7"  lengthEncode="ASC"  lengthType="NONE" dataLength="10"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 11 - SYSTEM TRACE NO -->
-    <field position="11" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 12 - DATE & TIME, LOCAL TXN -->
-    <field position="12" lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 14 - EXPIRATION DATE -->
-    <field position="14" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 15 - Date, Settlement -->
-    <field position="15" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 22 - POS ENTRY MODE -->
-    <field position="22" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 24 - FUNCTION CODE -->
-    <field position="24" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 25 - POS CONDITION CODE -->
-    <field position="25" lengthEncode="ASC"  lengthType="NONE" dataLength="2"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 35 - TRACK 2 DATA -->
-    <field position="35" lengthEncode="ASC"  lengthType="PAIR" dataLength="37"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 37 - RETRIEVAL REFERENCE NUMBER -->
-    <field position="37" lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 38 - APPROVAL NUMBER -->
-    <field position="38" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 39 - RESPONSE CODE -->
-    <field position="39" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 41 - TERMINAL ID -->
-    <field position="41" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 42 - MERCHANT ID -->
-    <field position="42" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 46 - AMOUNTS,FEES -->
-    <field position="46" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 48 - ADDITIONAL DATA, PRIVATE -->
-    <field position="48" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 49 - CURRENCY CODE -->
-    <field position="49" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 51 - Currency Code, Cardholder Billing -->
-    <field position="51" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 52 - PIN BLOCK (ENCRYPTED) -->
-    <field position="52" lengthEncode="ASC"  lengthType="PAIR" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
-    <!-- 53 - COMMUNICATION KEY -->
-    <field position="53" lengthEncode="ASC"  lengthType="PAIR" dataLength="99"  dataEncode="BIT" alignType="LEFT" padding="0"/>
-    <!-- 55 - EMV DATA -->
-    <field position="55" lengthEncode="BCD"  lengthType="TRIP" dataLength="999" dataEncode="BIT" alignType="LEFT" padding="0"/>
-    <!-- 61 -  -->
-    <field position="61" lengthEncode="ASC"  lengthType="NONE" dataLength="0"   dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 62 - CUSTOMER DEFINED RESPONSE -->
-    <field position="62" lengthEncode="ASC"  lengthType="TRIP" dataLength="999" dataEncode="ASC" alignType="LEFT" padding="0"/>
-    <!-- 64 - PRIMARY MAC DATA -->
-    <field position="64" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
-    <!-- 102 - CARD ACCOUNT NUMBER -->
-    <field position="102" lengthEncode="ASC" lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"/>
-    <!-- 128 - SECONDARY MAC DATA -->
-    <field position="128" lengthEncode="ASC" lengthType="PAIR" dataLength="99"  dataEncode="BIT" alignType="LEFT" padding="0"/>
+    <!-- HEADER(包含TPDU) 不用在这里配置，调用 addHeader 添加 -->
+    <field position="0"  lengthEncode="ASC"  lengthType="NONE" dataLength="4"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="MESSAGE TYPE ID"/>
+    <field position="2"  lengthEncode="ASC"  lengthType="PAIR" dataLength="19"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="PAN"/>
+    <field position="3"  lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="PROCESSING CODE"/>
+    <field position="4"  lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="TRANSACTION AMOUNT"/>
+    <field position="5"  lengthEncode="ASC"  lengthType="NONE" dataLength="13"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="Amount, Settlement"/>
+    <field position="7"  lengthEncode="ASC"  lengthType="NONE" dataLength="10"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="DATE TIME, TRANSMISSION"/>
+    <field position="11" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="SYSTEM TRACE NO"/>
+    <field position="12" lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="DATE TIME, LOCAL TXN"/>
+    <field position="14" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="EXPIRATION DATE"/>
+    <field position="15" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="Date, Settlement"/>
+    <field position="22" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="POS ENTRY MODE"/>
+    <field position="24" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="FUNCTION CODE"/>
+    <field position="25" lengthEncode="ASC"  lengthType="NONE" dataLength="2"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="POS CONDITION CODE"/>
+    <field position="35" lengthEncode="ASC"  lengthType="PAIR" dataLength="37"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="TRACK 2 DATA"/>
+    <field position="37" lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="RETRIEVAL REFERENCE NUMBER"/>
+    <field position="38" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="APPROVAL NUMBER"/>
+    <field position="39" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="RESPONSE CODE"/>
+    <field position="41" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="TERMINAL ID"/>
+    <field position="42" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="MERCHANT ID"/>
+    <field position="46" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="AMOUNTS,FEES"/>
+    <field position="48" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="ADDITIONAL DATA, PRIVATE"/>
+    <field position="49" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="CURRENCY CODE"/>
+    <field position="51" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="Currency Code, Cardholder Billing"/>
+    <field position="52" lengthEncode="ASC"  lengthType="PAIR" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"  desc="PIN BLOCK (ENCRYPTED)"/>
+    <field position="53" lengthEncode="ASC"  lengthType="PAIR" dataLength="99"  dataEncode="BIT" alignType="LEFT" padding="0"  desc="COMMUNICATION KEY"/>
+    <field position="55" lengthEncode="BCD"  lengthType="TRIP" dataLength="999" dataEncode="BIT" alignType="LEFT" padding="0"  desc="EMV DATA"/>
+    <field position="61" lengthEncode="ASC"  lengthType="NONE" dataLength="0"   dataEncode="ASC" alignType="LEFT" padding="0"  desc=""/>
+    <field position="62" lengthEncode="ASC"  lengthType="TRIP" dataLength="999" dataEncode="ASC" alignType="LEFT" padding="0"  desc="CUSTOMER DEFINED RESPONSE"/>
+    <field position="64" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"  desc="PRIMARY MAC DATA"/>
+    <field position="102" lengthEncode="ASC" lengthType="NONE" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"  desc="CARD ACCOUNT NUMBER"/>
+    <field position="128" lengthEncode="ASC" lengthType="PAIR" dataLength="99"  dataEncode="BIT" alignType="LEFT" padding="0"  desc="SECONDARY MAC DATA"/>
 </iso8583>

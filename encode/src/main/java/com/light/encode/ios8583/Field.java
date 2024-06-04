@@ -58,6 +58,11 @@ public final class Field implements Serializable, Cloneable {
      */
     private String dataEncode;
 
+    /**
+     * 域描述
+     */
+    private String desc;
+
     private Field() {
     }
 
@@ -204,6 +209,14 @@ public final class Field implements Serializable, Cloneable {
         }
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     public Field cloneField() {
         try {
             return (Field) super.clone();
@@ -262,6 +275,11 @@ public final class Field implements Serializable, Cloneable {
             return this;
         }
 
+        public Builder desc(String desc) {
+            map.put(Constant.Field.DESC, desc);
+            return this;
+        }
+
         public Field build() {
             Field field = new Field();
             Object object = map.get(Constant.Field.POSITION);
@@ -314,6 +332,11 @@ public final class Field implements Serializable, Cloneable {
             if (object != null) {
                 String lengthEncode = (String) object;
                 field.setLengthEncode(lengthEncode);
+            }
+            object = map.get(Constant.Field.DESC);
+            if (object != null) {
+                String desc = (String) object;
+                field.setDesc(desc);
             }
             return field;
         }

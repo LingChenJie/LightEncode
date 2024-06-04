@@ -76,6 +76,7 @@ public final class Iso8583Config {
                         String dataEncode = parser.getAttributeValue(null, Constant.Field.DATA_ENCODE);
                         String alignType = parser.getAttributeValue(null, Constant.Field.ALIGN_TYPE);
                         String padding = parser.getAttributeValue(null, Constant.Field.PADDING);
+                        String desc = parser.getAttributeValue(null, Constant.Field.DESC);
                         field = new Field.Builder()
                                 .position(Integer.parseInt(position))
                                 .lengthEncode(lengthEncode)
@@ -84,6 +85,7 @@ public final class Iso8583Config {
                                 .dataEncode(dataEncode)
                                 .alignType(alignType)
                                 .padding(padding)
+                                .desc(desc)
                                 .build();
                         fields.add(field);
                     }
