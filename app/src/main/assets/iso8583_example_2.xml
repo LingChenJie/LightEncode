@@ -33,7 +33,7 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     <field position="2"  lengthEncode="ASC"  lengthType="PAIR" dataLength="19"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="PAN"/>
     <field position="3"  lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="PROCESSING CODE"/>
     <field position="4"  lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="TRANSACTION AMOUNT"/>
-    <field position="5"  lengthEncode="ASC"  lengthType="NONE" dataLength="13"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="Amount, Settlement"/>
+    <field position="5"  lengthEncode="ASC"  lengthType="NONE" dataLength="13"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="AMOUNT, SETTLEMENT"/>
     <field position="7"  lengthEncode="ASC"  lengthType="NONE" dataLength="10"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="DATE TIME, TRANSMISSION"/>
     <field position="11" lengthEncode="ASC"  lengthType="NONE" dataLength="6"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="SYSTEM TRACE NO"/>
     <field position="12" lengthEncode="ASC"  lengthType="NONE" dataLength="12"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="DATE TIME, LOCAL TXN"/>
@@ -48,12 +48,13 @@ ISO8583 报文结构: 报文长度 + HEADER(包含TPDU) + 消息类型标识符(
     <field position="39" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="RESPONSE CODE"/>
     <field position="41" lengthEncode="ASC"  lengthType="NONE" dataLength="8"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="TERMINAL ID"/>
     <field position="42" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="MERCHANT ID"/>
-    <field position="46" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="AMOUNTS,FEES"/>
+    <field position="46" lengthEncode="ASC"  lengthType="TRIP" dataLength="999" dataEncode="ASC" alignType="LEFT" padding="0"  desc="AMOUNTS,FEES"/>
     <field position="48" lengthEncode="ASC"  lengthType="NONE" dataLength="15"  dataEncode="ASC" alignType="LEFT" padding="0"  desc="ADDITIONAL DATA, PRIVATE"/>
     <field position="49" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="CURRENCY CODE"/>
     <field position="51" lengthEncode="ASC"  lengthType="NONE" dataLength="3"   dataEncode="ASC" alignType="LEFT" padding="0"  desc="Currency Code, Cardholder Billing"/>
     <field position="52" lengthEncode="ASC"  lengthType="PAIR" dataLength="8"   dataEncode="BIT" alignType="LEFT" padding="0"  desc="PIN BLOCK (ENCRYPTED)"/>
     <field position="53" lengthEncode="ASC"  lengthType="PAIR" dataLength="99"  dataEncode="BIT" alignType="LEFT" padding="0"  desc="COMMUNICATION KEY"/>
+    <field position="54" lengthEncode="ASC"  lengthType="TRIP" dataLength="999" dataEncode="ASC" alignType="LEFT" padding="0"  desc="AMOUNTS, ADDITIONAL"/>
     <field position="55" lengthEncode="BCD"  lengthType="TRIP" dataLength="999" dataEncode="BIT" alignType="LEFT" padding="0"  desc="EMV DATA"/>
     <field position="61" lengthEncode="ASC"  lengthType="NONE" dataLength="0"   dataEncode="ASC" alignType="LEFT" padding="0"  desc=""/>
     <field position="62" lengthEncode="ASC"  lengthType="TRIP" dataLength="999" dataEncode="ASC" alignType="LEFT" padding="0"  desc="CUSTOMER DEFINED RESPONSE"/>

@@ -112,10 +112,7 @@ final class Iso8583Encode {
         }
 
         // body - all field
-        int index = lengthLength + headerLength + msgTypeLength + bitmapLength - 1;
-        if (index < 0) {
-            index  = 0;
-        }
+        int index = lengthLength + headerLength + msgTypeLength + bitmapLength;
         boolean[] bitmapBinaryBytes = new boolean[bitmapLength * 8 + 1];
         Iterator<Map.Entry<String, Field>> entryIterator = fieldMap.entrySet().iterator();
         next = entryIterator.hasNext();
@@ -218,6 +215,11 @@ final class Iso8583Encode {
             }
             if (L.PRINT_DEBUG_MSG) {
                 LogUtils.d(L.TAG, "end index:" + index);
+            }
+            if (L.PRINT_DEBUG_MSG) {
+
+                LogUtils.d(L.TAG, "dataBytes:" + ByteUtil.bytes2HexString(dataBytes));
+                LogUtils.d(L.TAG, "content:" + ByteUtil.bytes2HexString(content));
             }
             next = entryIterator.hasNext();
         }

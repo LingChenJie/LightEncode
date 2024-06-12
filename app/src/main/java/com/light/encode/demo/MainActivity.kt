@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.advice).setOnClickListener { advice() }
         findViewById<Button>(R.id.batchUpload).setOnClickListener { batchUpload() }
         findViewById<Button>(R.id.trailer).setOnClickListener { trailer() }
+        findViewById<Button>(R.id.test).setOnClickListener { test() }
         findViewById<Button>(R.id.iso8583).setOnClickListener { iso8583() }
     }
 
@@ -192,7 +193,7 @@ class MainActivity : AppCompatActivity() {
                 "00 E8 FB B0 39 32 30 35 30 32 31 33 31 30 30 31" +
                 "32 31 33 37 30 37"
         val decodeHexStr = response.replace(" ", "")
-        val decodeBytes = ByteUtil.hexString2Bytes(decodeHexStr)
+        val decodeBytes = ByteUtil.hexString2Bytes(encodeHexStr)
         val decodeBuilder = Iso8583.DecodeBuilder()
             .addHeaderLength(5)
             .addDataBytes(decodeBytes)
@@ -496,6 +497,21 @@ class MainActivity : AppCompatActivity() {
         val decodeBytes = ByteUtil.hexString2Bytes(decodeHexStr)
         val decodeBuilder = Iso8583.DecodeBuilder()
             .addLengthLength(0)
+            .addHeaderLength(5)
+            .addDataBytes(decodeBytes)
+            .build()
+        val decode = decodeBuilder.decode()
+        decode.fieldMap.forEach { (position, field) ->
+            LogUtil.e(TAG, "position:$position, value:${field.dataString}")
+        }
+    }
+
+    private fun test() {
+        // 解包
+        val response = "01146001010000303230303030058020C082013130303030303030303030303030303235303030303334323430363131323235363035303731323030303033323632323537363734303333353331363244333030393230313139343538333331313233343536373831323334353637383930313233343530353001455F2A02005082027C008408A000000333010102950500000000009A032406119C01009F02060000000000259F03060000000000009F090200309F101307010103A00000040A01000000000012362F9C9F1A0200509F1E0830303030303930359F2608810C2DE7176326AB9F2701809F3303E0F8C89F34033F00009F3501229F360200609F37046B862E669F410400000011003938433346373634"
+        val decodeHexStr = response.replace(" ", "")
+        val decodeBytes = ByteUtil.hexString2Bytes(decodeHexStr)
+        val decodeBuilder = Iso8583.DecodeBuilder()
             .addHeaderLength(5)
             .addDataBytes(decodeBytes)
             .build()
