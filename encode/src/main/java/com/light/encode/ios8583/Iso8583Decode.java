@@ -162,7 +162,7 @@ class Iso8583Decode {
                 }
             }
             field.setDataString(dataString);
-            field.setDataBytes(dataBytes);
+            field.setDataBytes(fieldDataBytes);
             if (fieldLengthType > Helper.LENGTH_VAR_NONE) {
                 if (fieldDataEncode == Helper.ENCODE_BCD) {
                     if (fieldAlignType == Helper.ALIGN_LEFT) {
