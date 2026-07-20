@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
+    <color name="primary">#0F766E</color>
+    <color name="primary_dark">#115E59</color>
+    <color name="primary_soft">#CCFBF1</color>
+    <color name="navy">#0F172A</color>
+    <color name="navy_light">#1E293B</color>
+    <color name="page_background">#F1F5F9</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_muted">#F8FAFC</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="divider">#E2E8F0</color>
+    <color name="input_border">#CBD5E1</color>
+    <color name="success">#5EEAD4</color>
+    <color name="danger">#FB7185</color>
+    <color name="warning_background">#FFFBEB</color>
+    <color name="warning_border">#FDE68A</color>
+    <color name="warning_text">#92400E</color>
+    <color name="header_secondary">#CBD5E1</color>
+    <color name="header_badge">#2634D399</color>
+    <color name="header_badge_text">#99F6E4</color>
+    <color name="output_text">#CCFBF1</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

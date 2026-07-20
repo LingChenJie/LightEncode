@@ -33,17 +33,8 @@ android {
 }
 
 dependencies {
-
-    implementation 'com.github.LingChenJie:LightArchitecture:1.1.10'
-    implementation project(':encode')
-
-    // ShapeView：https://github.com/getActivity/ShapeView
-    implementation 'com.github.getActivity:ShapeView:9.0'
-    // ShapeDrawable：https://github.com/getActivity/ShapeDrawable
-    implementation 'com.github.getActivity:ShapeDrawable:3.0'
-    // 标题栏框架：https://github.com/getActivity/TitleBar
-    implementation 'com.github.getActivity:TitleBar:10.0'
-
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation project(':ios8583encode')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

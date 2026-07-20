@@ -1,3 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LightEncode</string>
+    <string name="app_name">银联 ISO8583 调试台</string>
+    <string name="header_badge">UNIONPAY · POS MESSAGE LAB</string>
+    <string name="app_subtitle">面向 POS 联调的组包、解包与字段核验工具</string>
+    <string name="security_notice">仅使用测试数据。PAN、二磁道、PIN、IC 数据和 MAC 默认脱敏；工具不包含真实密钥或生产 MAC 算法。</string>
+    <string name="symbol_warning">!</string>
+    <string name="step_one">1</string>
+    <string name="step_two">2</string>
+
+    <string name="section_encode">配置与组包</string>
+    <string name="section_encode_hint">选择字段规范和交易预置，再按域号编辑数据。Bitmap 与字段顺序由核心库自动生成。</string>
+    <string name="section_decode">原始报文解包</string>
+    <string name="section_decode_hint">粘贴连续或带空格的 HEX 报文，设置渠道封装长度后查看 MTI、Bitmap 和各数据域。</string>
+
+    <string name="label_profile">字段规范</string>
+    <string name="label_preset">交易预置</string>
+    <string name="label_header">TPDU / Header（HEX）</string>
+    <string name="label_header_length">Header 长度（bytes）</string>
+    <string name="label_length_bytes">Length 长度（bytes）</string>
+    <string name="label_mti">MTI</string>
+    <string name="label_fields">数据域</string>
+    <string name="label_encoded_hex">最终报文 HEX</string>
+    <string name="label_raw_message">原始报文 HEX</string>
+    <string name="label_decode_result">解包结果</string>
+
+    <string name="hint_header">例如 6001010000；没有则留空</string>
+    <string name="hint_length_bytes">2</string>
+    <string name="hint_mti">0200</string>
+    <string name="hint_fields">3=000000\n4=000000001000\n11=123456\n41=SUNMI001</string>
+    <string name="fields_helper">每行一个字段，格式 DE3=值 或 3=值；BIT 域填写连续 HEX。MTI 和 Bitmap 无需写入。</string>
+    <string name="hint_raw_message">支持连续 HEX、空格和换行</string>
+
+    <string name="action_encode">开始组包</string>
+    <string name="action_decode">开始解包</string>
+    <string name="action_clear">清空</string>
+    <string name="action_copy">复制 HEX</string>
+    <string name="action_paste">粘贴</string>
+    <string name="action_show_sensitive">显示敏感域</string>
+
+    <string name="status_ready">● 就绪 · 等待输入</string>
+    <string name="status_profile_loaded">● 已加载 %1$s</string>
+    <string name="status_preset_loaded">● 已载入 %1$s 示例</string>
+    <string name="status_encoded">● 组包成功 · %1$d 字节</string>
+    <string name="status_decoded">● 解包成功 · %1$d 个数据域</string>
+    <string name="status_failed">● %1$s失败 · %2$s</string>
+    <string name="status_copied">HEX 已复制</string>
+
+    <string name="empty_hex_output">组包结果将在这里显示</string>
+    <string name="empty_decode_result">尚未解包</string>
+    <string name="decode_meta_format">Length : %1$d\nHeader : %2$s\nMTI    : %3$s\nBitmap : %4$s</string>
+    <string name="field_meta_format">逻辑长度 %1$d · %2$d 字节</string>
+    <string name="field_no_description">未配置字段说明</string>
+
+    <string name="error_mti_required">MTI 不能为空</string>
+    <string name="error_message_required">原始报文不能为空</string>
+    <string name="error_number_required">%1$s必须是数字</string>
+    <string name="error_number_range">%1$s必须在 %2$d..%3$d 之间</string>
+    <string name="error_clipboard_empty">剪贴板中没有可用文本</string>
+    <string name="clipboard_hex_label">ISO8583 HEX</string>
 </resources>

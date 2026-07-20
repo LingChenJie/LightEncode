@@ -1,0 +1,56 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'com.android.library'
+}
+
+static def buildDate() {
+    def df = new SimpleDateFormat("yyyyMMdd")
+    df.setTimeZone(TimeZone.getDefault())
+    return df.format(new Date())
+}
+
+android {
+    namespace 'com.light.ios8583encode'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+        versionCode 8
+        versionName "1.0.8"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    testOptions {
+        // 编解码单元测试运行在 JVM；Android Log 在此环境返回默认值即可。
+        unitTests.returnDefaultValues = true
+    }
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "light_encode_" + defaultConfig.versionName + "_" + buildDate() + ".aar"
+        }
+    }
+}
+
+dependencies {
+    // 编解码库只需要 Gson 做通用对象克隆，不应引入整套应用架构与网络组件。
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    testImplementation 'junit:junit:4.13.2'
+    // AGP 7.4.x 可稳定 dex 的 AndroidX Test 版本。
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

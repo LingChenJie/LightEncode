@@ -1,112 +1,403 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:importantForAutofill="noExcludeDescendants"
     tools:context=".MainActivity">
 
-    <com.hjq.bar.TitleBar
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/app_name" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:paddingStart="24dp"
+            android:paddingTop="28dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp">
 
-            <Button
-                android:id="@+id/mac"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_header_badge"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:text="@string/header_badge"
+                android:textColor="@color/header_badge_text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="27sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="mac" />
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="2dp"
+                android:text="@string/app_subtitle"
+                android:textColor="@color/header_secondary"
+                android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/logon"
+            <TextView
+                android:id="@+id/statusText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="logon" />
-
-            <Button
-                android:id="@+id/cashout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="cashout" />
-
-            <Button
-                android:id="@+id/_void"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="void" />
-
-            <Button
-                android:id="@+id/sale"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="sale" />
-
-            <Button
-                android:id="@+id/settle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="settle" />
-
-            <Button
-                android:id="@+id/logon2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="logon2" />
-
-            <Button
-                android:id="@+id/advice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="advice" />
-
-            <Button
-                android:id="@+id/batchUpload"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="batch upload" />
-
-            <Button
-                android:id="@+id/trailer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="trailer" />
-
-            <Button
-                android:id="@+id/test"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="test" />
-
-            <Button
-                android:id="@+id/iso8583"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_8"
-                android:text="iso8583" />
-
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/status_ready"
+                android:textColor="@color/success"
+                android:textSize="13sp" />
         </LinearLayout>
 
-    </ScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_warning"
+            android:orientation="horizontal"
+            android:padding="14dp">
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/symbol_warning"
+                android:textColor="@color/warning_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:lineSpacingExtra="2dp"
+                android:text="@string/security_notice"
+                android:textColor="@color/warning_text"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Iso.Card"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                style="@style/Widget.Iso.SectionNumber"
+                android:text="@string/step_one" />
+
+            <TextView
+                style="@style/Widget.Iso.SectionTitle"
+                android:text="@string/section_encode" />
+
+            <TextView
+                style="@style/Widget.Iso.SectionHint"
+                android:text="@string/section_encode_hint" />
+
+            <TextView
+                style="@style/Widget.Iso.Label"
+                android:text="@string/label_profile" />
+
+            <Spinner
+                android:id="@+id/profileSpinner"
+                style="@style/Widget.Iso.Spinner" />
+
+            <TextView
+                style="@style/Widget.Iso.Label"
+                android:text="@string/label_preset" />
+
+            <Spinner
+                android:id="@+id/presetSpinner"
+                style="@style/Widget.Iso.Spinner" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.Iso.Label"
+                        android:text="@string/label_header" />
+
+                    <EditText
+                        android:id="@+id/headerInput"
+                        style="@style/Widget.Iso.Input"
+                        android:fontFamily="monospace"
+                        android:hint="@string/hint_header"
+                        android:inputType="textNoSuggestions"
+                        android:maxLines="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.Iso.Label"
+                        android:text="@string/label_length_bytes" />
+
+                    <EditText
+                        android:id="@+id/lengthBytesInput"
+                        style="@style/Widget.Iso.Input"
+                        android:gravity="center"
+                        android:hint="@string/hint_length_bytes"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:maxLines="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/Widget.Iso.Label"
+                android:text="@string/label_mti" />
+
+            <EditText
+                android:id="@+id/mtiInput"
+                style="@style/Widget.Iso.Input"
+                android:fontFamily="monospace"
+                android:hint="@string/hint_mti"
+                android:inputType="textNoSuggestions"
+                android:maxLength="4"
+                android:maxLines="1" />
+
+            <TextView
+                style="@style/Widget.Iso.Label"
+                android:text="@string/label_fields" />
+
+            <EditText
+                android:id="@+id/fieldsInput"
+                style="@style/Widget.Iso.Input.Multiline"
+                android:hint="@string/hint_fields"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:minLines="7" />
+
+            <TextView
+                style="@style/Widget.Iso.Helper"
+                android:text="@string/fields_helper" />
+
+            <LinearLayout
+                style="@style/Widget.Iso.ActionRow">
+
+                <Button
+                    android:id="@+id/encodeButton"
+                    style="@style/Widget.Iso.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/action_encode" />
+
+                <Button
+                    android:id="@+id/clearEncodeButton"
+                    style="@style/Widget.Iso.Button.Secondary"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/action_clear" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/label_encoded_hex"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/copyEncodedButton"
+                    style="@style/Widget.Iso.Button.Text"
+                    android:text="@string/action_copy" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/encodedOutput"
+                style="@style/Widget.Iso.Output"
+                android:text="@string/empty_hex_output"
+                android:textIsSelectable="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Widget.Iso.Card"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                style="@style/Widget.Iso.SectionNumber"
+                android:text="@string/step_two" />
+
+            <TextView
+                style="@style/Widget.Iso.SectionTitle"
+                android:text="@string/section_decode" />
+
+            <TextView
+                style="@style/Widget.Iso.SectionHint"
+                android:text="@string/section_decode_hint" />
+
+            <TextView
+                style="@style/Widget.Iso.Label"
+                android:text="@string/label_raw_message" />
+
+            <EditText
+                android:id="@+id/decodeInput"
+                style="@style/Widget.Iso.Input.Multiline"
+                android:hint="@string/hint_raw_message"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:minLines="6" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.Iso.Label"
+                        android:text="@string/label_header_length" />
+
+                    <EditText
+                        android:id="@+id/decodeHeaderLengthInput"
+                        style="@style/Widget.Iso.Input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:maxLines="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.Iso.Label"
+                        android:text="@string/label_length_bytes" />
+
+                    <EditText
+                        android:id="@+id/decodeLengthBytesInput"
+                        style="@style/Widget.Iso.Input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:maxLines="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/Widget.Iso.ActionRow">
+
+                <Button
+                    android:id="@+id/decodeButton"
+                    style="@style/Widget.Iso.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/action_decode" />
+
+                <Button
+                    android:id="@+id/pasteDecodeButton"
+                    style="@style/Widget.Iso.Button.Secondary"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/action_paste" />
+
+                <Button
+                    android:id="@+id/clearDecodeButton"
+                    style="@style/Widget.Iso.Button.Text"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/action_clear" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="22dp"
+                android:background="@color/divider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/label_decode_result"
+                    android:textColor="@color/text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/showSensitiveSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_show_sensitive"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/decodeMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_meta"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="3dp"
+                android:padding="14dp"
+                android:text="@string/empty_decode_result"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textIsSelectable="true" />
+
+            <LinearLayout
+                android:id="@+id/decodedFieldsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
