@@ -3,6 +3,9 @@
 Android ISO8583 与 BER-TLV 编解码库，`app` 模块提供常见交易报文示例，核心实现位于
 `ios8583encode` 模块。
 
+核心库的目录、报文结构、字段长度约定、接入示例与维护边界见
+[`ios8583encode/README.md`](ios8583encode/README.md)。
+
 ## app 报文工作台
 
 `app` 是面向开发和联调的 ISO8583 组包/解包工具，内置银联常见业务样例：消费（0200）、

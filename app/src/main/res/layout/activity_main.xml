@@ -113,14 +113,6 @@
 
             <TextView
                 style="@style/Widget.Iso.Label"
-                android:text="@string/label_profile" />
-
-            <Spinner
-                android:id="@+id/profileSpinner"
-                style="@style/Widget.Iso.Spinner" />
-
-            <TextView
-                style="@style/Widget.Iso.Label"
                 android:text="@string/label_preset" />
 
             <Spinner

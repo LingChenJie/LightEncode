@@ -16,8 +16,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
-import com.light.encode.ios8583.Field
-import com.light.encode.ios8583.Iso8583
+import com.light.encode.ios8583.Iso8583Field
+import com.light.encode.ios8583.Iso8583Message
 import com.light.encode.ios8583.Iso8583Config
 import com.light.encode.util.ByteUtil
 
@@ -29,7 +29,6 @@ import com.light.encode.util.ByteUtil
  */
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var profileSpinner: Spinner
     private lateinit var presetSpinner: Spinner
     private lateinit var headerInput: EditText
     private lateinit var lengthBytesInput: EditText
@@ -44,19 +43,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var showSensitiveSwitch: SwitchCompat
     private lateinit var statusText: TextView
 
-    private var currentProfile = Profile.ASCII_POS
-    private var decodedMessage: Iso8583? = null
+    private var decodedMessage: Iso8583Message? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bindViews()
-        setupSelectors()
+        setupPresetSelector()
         setupActions()
     }
 
     private fun bindViews() {
-        profileSpinner = findViewById(R.id.profileSpinner)
         presetSpinner = findViewById(R.id.presetSpinner)
         headerInput = findViewById(R.id.headerInput)
         lengthBytesInput = findViewById(R.id.lengthBytesInput)
@@ -72,19 +69,9 @@ class MainActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
     }
 
-    private fun setupSelectors() {
-        profileSpinner.adapter = spinnerAdapter(Profile.values().map { it.title })
+    /** 初始化消费场景选择器；切换场景只替换页面输入，不会自动发送或保存报文。 */
+    private fun setupPresetSelector() {
         presetSpinner.adapter = spinnerAdapter(Preset.values().map { it.title })
-
-        profileSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                currentProfile = Profile.values()[position]
-                loadProfile(currentProfile)
-                applyPreset(Preset.values()[presetSpinner.selectedItemPosition])
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-        }
         presetSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 applyPreset(Preset.values()[position])
@@ -119,13 +106,17 @@ class MainActivity : AppCompatActivity() {
         showSensitiveSwitch.setOnCheckedChangeListener { _, _ -> renderDecodedMessage() }
     }
 
-    private fun loadProfile(profile: Profile) {
-        assets.open(profile.asset).use { Iso8583Config.setBitmapConfig(it) }
-        setStatus(getString(R.string.status_profile_loaded, profile.title), false)
+    /**
+     * 加载与银联消费字段表对应的唯一配置。
+     *
+     * 核心库当前使用进程级字段模板，所以每次编解码前重新加载，确保示例不依赖隐式状态。
+     */
+    private fun loadFieldConfig() {
+        assets.open(FIELD_CONFIG_ASSET).use(Iso8583Config::load)
     }
 
     private fun applyPreset(preset: Preset) {
-        val sample = preset.sample(currentProfile)
+        val sample = preset.sample()
         if (sample == null) return
         headerInput.setText(sample.header)
         lengthBytesInput.setText(sample.lengthBytes.toString())
@@ -137,18 +128,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun encodeMessage() = runToolAction(getString(R.string.action_encode)) {
-        loadProfile(currentProfile)
+        loadFieldConfig()
         val header = MessageTextUtils.compactHex(headerInput.text.toString())
         val lengthBytes = parseSmallInt(lengthBytesInput, getString(R.string.label_length_bytes), 0..4)
         val mti = mtiInput.text.toString().trim()
         require(mti.isNotEmpty()) { getString(R.string.error_mti_required) }
 
-        val builder = Iso8583.EncodeBuilder()
-            .addLengthLength(lengthBytes)
-            .addMsgType(mti)
-        if (header.isNotEmpty()) builder.addHeader(header)
+        // Length、Header 与 MTI 不属于普通数据域，需要分别交给 Builder。
+        val builder = Iso8583Message.EncodeBuilder()
+            .lengthHeaderBytes(lengthBytes)
+            .messageType(mti)
+        if (header.isNotEmpty()) builder.header(header)
+        // DE1 是位图保留位；输入解析器仅允许 DE2～DE128，位图由核心库自动生成。
         MessageTextUtils.parseFields(fieldsInput.text.toString()).forEach { (position, value) ->
-            builder.addField(position, value)
+            builder.field(position, value)
         }
 
         val encoded = builder.build().encode()
@@ -161,7 +154,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun decodeMessage() = runToolAction(getString(R.string.action_decode)) {
-        loadProfile(currentProfile)
+        loadFieldConfig()
         val hex = MessageTextUtils.compactHex(decodeInput.text.toString())
         require(hex.isNotEmpty()) { getString(R.string.error_message_required) }
         val headerLength = parseSmallInt(
@@ -175,10 +168,11 @@ class MainActivity : AppCompatActivity() {
             0..4
         )
 
-        decodedMessage = Iso8583.DecodeBuilder()
-            .addLengthLength(lengthBytes)
-            .addHeaderLength(headerLength)
-            .addDataBytes(ByteUtil.hexString2Bytes(hex))
+        // 解包必须明确渠道 Length 和 Header 的字节数，它们无法从位图中推导。
+        decodedMessage = Iso8583Message.DecodeBuilder()
+            .lengthHeaderBytes(lengthBytes)
+            .headerLength(headerLength)
+            .data(ByteUtil.hexString2Bytes(hex))
             .build()
             .decode()
         renderDecodedMessage()
@@ -201,16 +195,17 @@ class MainActivity : AppCompatActivity() {
             R.string.decode_meta_format,
             message.length,
             header.ifEmpty { "—" },
-            message.msgType ?: "—",
+            message.messageType ?: "—",
             message.bitmap ?: "—"
         )
+        // PAN、磁道、PIN、IC 数据和 MAC 默认脱敏，避免调试截图意外暴露敏感信息。
         val showSensitive = showSensitiveSwitch.isChecked
         message.fieldMap.forEach { (name, field) ->
             decodedFieldsContainer.addView(createFieldView(name, field, showSensitive))
         }
     }
 
-    private fun createFieldView(name: String, field: Field, showSensitive: Boolean): View {
+    private fun createFieldView(name: String, field: Iso8583Field, showSensitive: Boolean): View {
         val view = LayoutInflater.from(this)
             .inflate(R.layout.item_decoded_field, decodedFieldsContainer, false)
         val bytes = field.dataBytes ?: byteArrayOf()
@@ -265,90 +260,74 @@ class MainActivity : AppCompatActivity() {
         statusText.setTextColor(getColor(if (isError) R.color.danger else R.color.success))
     }
 
-    private enum class Profile(val title: String, val asset: String) {
-        ASCII_POS("ASCII · POS 调试规范", "iso8583_example_2.xml"),
-        BCD_BASIC("BCD · 基础示例规范", "iso8583_example.xml")
-    }
-
+    /** 页面预置只描述消费报文，不混入签到、冲正等其他交易规范。 */
     private enum class Preset(val title: String) {
-        SALE("消费请求 · 0200"),
-        SIGN_IN("签到请求 · 0800"),
-        REVERSAL("冲正请求 · 0400"),
+        CHIP_SALE("IC 卡消费请求 · 0200"),
+        MAGSTRIPE_SALE("磁条卡消费请求 · 0200"),
+        SALE_RESPONSE("消费成功响应 · 0210"),
         CUSTOM("自定义（保留当前输入）");
 
-        fun sample(profile: Profile): Sample? {
-            if (this == CUSTOM) return null
-            return if (profile == Profile.ASCII_POS) asciiSample() else bcdSample()
-        }
-
-        private fun asciiSample(): Sample = when (this) {
-            SALE -> Sample("6001010000", 2, "0200", """
-                3=000000
-                4=000000001000
-                7=0721123045
-                11=123456
-                22=051
-                41=SUNMI001
-                42=123456789012345
-                49=156
-                64=A1B2C3D4E5F60708
-            """.trimIndent())
-            SIGN_IN -> Sample("6001010000", 2, "0800", """
-                3=990000
-                7=0721123045
-                11=000001
-                24=811
-                41=SUNMI001
-                42=123456789012345
-                64=0000000000000000
-            """.trimIndent())
-            REVERSAL -> Sample("6001010000", 2, "0400", """
+        fun sample(): Sample? = when (this) {
+            CHIP_SALE -> Sample("6001010000", 2, "0200", """
+                # IC 卡消费：示例金额为 10.00 元；DE55、PIN Block 和 MAC 均为测试值
                 2=6222021234567890
                 3=000000
                 4=000000001000
-                7=0721123045
                 11=123456
+                12=143025
+                13=0721
+                14=2912
                 22=051
-                24=400
+                23=001
                 25=00
-                37=123456789012
+                26=12
                 41=SUNMI001
                 42=123456789012345
                 49=156
+                52=1234567890ABCDEF
+                53=2600000000000000
+                55=9F2608A1A2A3A4A5A6A7A89F2701809F36020001950500000000009A032607219C01009F02060000000010005F2A02015682027C009F1A0201569F03060000000000009F3303E0F8C8
                 64=0000000000000000
             """.trimIndent())
-            CUSTOM -> error("Custom preset has no sample")
-        }
-
-        private fun bcdSample(): Sample = when (this) {
-            SALE -> Sample("6001010000", 2, "0200", """
+            MAGSTRIPE_SALE -> Sample("6001010000", 2, "0200", """
+                # 磁条卡消费：DE35 使用 D 作为二磁道分隔符
                 2=6222021234567890
                 3=000000
                 4=000000001000
-                11=123456
-                22=0051
+                11=123457
+                12=143126
+                13=0721
+                14=2912
+                22=021
+                25=00
+                26=12
+                35=6222021234567890D29122011234567890
                 41=SUNMI001
                 42=123456789012345
-                64=A1B2C3D4E5F60708
-            """.trimIndent())
-            SIGN_IN -> Sample("6001010000", 2, "0800", """
-                3=990000
-                11=000001
-                41=SUNMI001
-                42=123456789012345
+                49=156
+                52=1234567890ABCDEF
+                53=2600000000000000
                 64=0000000000000000
             """.trimIndent())
-            REVERSAL -> Sample("6001010000", 2, "0400", """
-                2=6222021234567890
+            SALE_RESPONSE -> Sample("6001010000", 2, "0210", """
+                # 消费成功响应：DE39=00；响应 MAC 仍为测试占位值
                 3=000000
                 4=000000001000
                 11=123456
-                22=0051
+                12=143025
+                13=0721
+                15=0722
+                32=12345678
+                37=123456789012
+                38=ABC123
+                39=00
                 41=SUNMI001
                 42=123456789012345
+                44=CHINA UNIONPAY
+                49=156
                 64=0000000000000000
             """.trimIndent())
-            CUSTOM -> error("Custom preset has no sample")
+            CUSTOM -> null
         }
     }
 
@@ -358,4 +337,9 @@ class MainActivity : AppCompatActivity() {
         val mti: String,
         val fields: String
     )
+
+    private companion object {
+        /** 与截图中的消费报文字段表对应；app 不再维护容易混淆的多套配置。 */
+        const val FIELD_CONFIG_ASSET = "unionpay_sale.xml"
+    }
 }

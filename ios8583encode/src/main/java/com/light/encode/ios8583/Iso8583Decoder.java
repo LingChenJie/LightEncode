@@ -2,13 +2,13 @@ package com.light.encode.ios8583;
 
 import android.util.Log;
 import com.light.encode.util.ByteUtil;
-import com.light.encode.util.L;
 import com.light.encode.util.RegularUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class Iso8583Decode {
+/** ISO8583 解包实现；外部统一通过 {@link Iso8583Message#decode()} 调用。 */
+final class Iso8583Decoder {
 
     /**
      * ISO8583 解码
@@ -19,7 +19,7 @@ class Iso8583Decode {
      * @param fieldConfigMap 域配置map
      * @return
      */
-    public static Iso8583 decode(byte[] dataBytes, int lengthLength, int headerLength, Map<String, Field> fieldConfigMap) {
+    public static Iso8583Message decode(byte[] dataBytes, int lengthLength, int headerLength, Map<String, Iso8583Field> fieldConfigMap) {
         if (lengthLength < 0 || headerLength < 0) {
             throw new IllegalArgumentException("Message segment lengths cannot be negative");
         }
@@ -27,7 +27,7 @@ class Iso8583Decode {
             throw new IllegalArgumentException("fieldConfigMap cannot be null");
         }
         requireAvailable(dataBytes, 0, lengthLength + headerLength + 8, "message header and bitmap");
-        Iso8583.Builder builder = new Iso8583.Builder();
+        Iso8583Message.ResultBuilder builder = new Iso8583Message.ResultBuilder();
 
         log("----------------------------------------------------------------");
         log("-----------------ISO8583 decode start---------------------------");
@@ -39,8 +39,13 @@ class Iso8583Decode {
             System.arraycopy(dataBytes, 0, lengthBytes, 0, lengthLength);
             String lengthString = ByteUtil.bytes2HexString(lengthBytes);
             int length = Integer.parseInt(lengthString, 16);
+            int actualLength = dataBytes.length - lengthLength;
+            if (length != actualLength) {
+                throw new IllegalArgumentException(
+                        "Message length mismatch: declared " + length + ", actual " + actualLength);
+            }
             log("| Length: " + lengthString + " (" + length + ")");
-            builder.addLength(length);
+            builder.length(length);
         }
 
         // header
@@ -49,16 +54,16 @@ class Iso8583Decode {
             System.arraycopy(dataBytes, lengthLength, headerBytes, 0, headerLength);
             String header = ByteUtil.bytes2HexString(headerBytes);
             log("| Header: " + header);
-            builder.addHeader(headerBytes);
+            builder.header(headerBytes);
         }
 
         // msgType
         int msgTypeLength = 0;
-        String msgTypeFieldName = Helper.getFieldName(Constant.Position.MSG_TYPE);
-        Field msgTypeField = fieldConfigMap.get(msgTypeFieldName);
+        String msgTypeFieldName = Iso8583FieldSupport.fieldName(Iso8583Constant.Position.MSG_TYPE);
+        Iso8583Field msgTypeField = fieldConfigMap.get(msgTypeFieldName);
         if (msgTypeField != null) {
-            int dataEncode = msgTypeField.getDataEncode();
-            if (dataEncode == Helper.ENCODE_ASC) {
+            int dataEncode = msgTypeField.dataEncodingCode();
+            if (dataEncode == Iso8583FieldSupport.ENCODE_ASCII) {
                 msgTypeLength = msgTypeField.getDataLength();
             } else {
                 msgTypeLength = msgTypeField.getDataLength() / 2 + msgTypeField.getDataLength() % 2;
@@ -67,13 +72,13 @@ class Iso8583Decode {
             requireAvailable(dataBytes, lengthLength + headerLength, msgTypeLength, "message type");
             System.arraycopy(dataBytes, lengthLength + headerLength, msgTypeBytes, 0, msgTypeLength);
             String msgType;
-            if (dataEncode == Helper.ENCODE_ASC) {
+            if (dataEncode == Iso8583FieldSupport.ENCODE_ASCII) {
                 msgType = ByteUtil.asciiBytes2String(msgTypeBytes);
             } else {
                 msgType = ByteUtil.bytes2HexString(msgTypeBytes);
             }
             log("| MsgType: " + msgType);
-            builder.addMsgType(msgType);
+            builder.messageType(msgType);
         }
 
         // bitmap
@@ -91,35 +96,35 @@ class Iso8583Decode {
         }
         String bitmapString = ByteUtil.bytes2HexString(bitmapBytes);
         log("| Bitmap: " + bitmapString);
-        builder.addBitmap(bitmapString);
+        builder.bitmap(bitmapString);
 
         // body - all field
-        HashMap<String, Field> fieldMap = new HashMap<>();
+        HashMap<String, Iso8583Field> fieldMap = new HashMap<>();
         int index = lengthLength + headerLength + msgTypeLength + bitmapLength;
         for (int position = 2; position < bitmapBooleans.length; position++) {
             boolean bool = bitmapBooleans[position];
             if (!bool) {// 该域无值，继续循环下一次
                 continue;
             }
-            String fieldName = Helper.getFieldName(position);
-            Field field = fieldConfigMap.get(fieldName);
+            String fieldName = Iso8583FieldSupport.fieldName(position);
+            Iso8583Field field = fieldConfigMap.get(fieldName);
             if (field == null) {
                 // 未知域没有长度信息，无法可靠定位后续域，继续会造成静默错位。
-                throw new IllegalArgumentException("Field [" + position + "] is present but not configured");
+                throw new IllegalArgumentException("Iso8583Field [" + position + "] is present but not configured");
             }
-            int fieldAlignType = field.getAlignType();
-            int fieldDataEncode = field.getDataEncode();
+            int fieldAlignType = field.alignCode();
+            int fieldDataEncode = field.dataEncodingCode();
             int fieldDataLength = field.getDataLength();
-            int fieldLengthType = field.getLengthType();
-            int fieldLengthEncode = field.getLengthEncode();
+            int fieldLengthType = field.lengthTypeCode();
+            int fieldLengthEncode = field.lengthEncodingCode();
             String desc = field.getDesc();
             // handle length
             int bytesDataLength = 0;
             String dataLengthString;// field data length
-            if (fieldLengthType > Helper.LENGTH_VAR_NONE) {// 变长
+            if (fieldLengthType > Iso8583FieldSupport.LENGTH_VAR_NONE) {// 变长
                 // handle byte array of length
                 int variableLength;
-                if (fieldLengthEncode == Helper.ENCODE_BCD) {
+                if (fieldLengthEncode == Iso8583FieldSupport.ENCODE_BCD) {
                     variableLength = (fieldLengthType + 1) / 2;
                     requireAvailable(dataBytes, index, variableLength, "length of field " + position);
                     byte[] variableLengthBytes = new byte[variableLength];
@@ -129,7 +134,7 @@ class Iso8583Decode {
                     if (dataLengthString.length() % 2 != 0) {
                         dataLengthString = "0" + dataLengthString;// 长度前补零
                     }
-                } else if (fieldLengthEncode == Helper.ENCODE_ASC) {
+                } else if (fieldLengthEncode == Iso8583FieldSupport.ENCODE_ASCII) {
                     variableLength = fieldLengthType;
                     requireAvailable(dataBytes, index, variableLength, "length of field " + position);
                     byte[] variableLengthBytes = new byte[variableLength];
@@ -138,31 +143,31 @@ class Iso8583Decode {
                     try {
                         fieldDataLength = Integer.parseInt(dataLengthString);
                     } catch (NumberFormatException e) {
-                        throw new IllegalArgumentException("Field [" + position + "] has an invalid ASCII length", e);
+                        throw new IllegalArgumentException("Iso8583Field [" + position + "] has an invalid ASCII length", e);
                     }
                 } else {
                     throw new RuntimeException("fieldLengthEncode not support");
                 }
-                if (fieldDataEncode == Helper.ENCODE_BCD) {
+                if (fieldDataEncode == Iso8583FieldSupport.ENCODE_BCD) {
                     bytesDataLength = fieldDataLength / 2 + fieldDataLength % 2;
-                } else if (fieldDataEncode == Helper.ENCODE_BIT) {
+                } else if (fieldDataEncode == Iso8583FieldSupport.ENCODE_BIT) {
                     bytesDataLength = fieldDataLength;
-                } else if (fieldDataEncode == Helper.ENCODE_ASC) {
+                } else if (fieldDataEncode == Iso8583FieldSupport.ENCODE_ASCII) {
                     bytesDataLength = fieldDataLength;
                 }
                 index = index + variableLength;
             } else {// 定长
-                if (fieldDataEncode == Helper.ENCODE_BCD) {
+                if (fieldDataEncode == Iso8583FieldSupport.ENCODE_BCD) {
                     bytesDataLength = fieldDataLength / 2 + fieldDataLength % 2;
-                } else if (fieldDataEncode == Helper.ENCODE_BIT) {
+                } else if (fieldDataEncode == Iso8583FieldSupport.ENCODE_BIT) {
                     bytesDataLength = fieldDataLength;
-                } else if (fieldDataEncode == Helper.ENCODE_ASC) {
+                } else if (fieldDataEncode == Iso8583FieldSupport.ENCODE_ASCII) {
                     bytesDataLength = fieldDataLength;
                 }
                 dataLengthString = String.valueOf(fieldDataLength);
             }
             requireAvailable(dataBytes, index, bytesDataLength, "value of field " + position);
-            if (L.PRINT_DEBUG_MSG) {
+            if (Iso8583Log.ENABLED) {
                 log("position:" + position + " dataLength:" + dataLengthString);
             }
             byte[] fieldDataBytes = new byte[bytesDataLength];
@@ -170,7 +175,7 @@ class Iso8583Decode {
             index = index + bytesDataLength;
             // handle data
             String dataString = ByteUtil.bytes2HexString(fieldDataBytes);
-            if (fieldDataEncode == Helper.ENCODE_ASC) {
+            if (fieldDataEncode == Iso8583FieldSupport.ENCODE_ASCII) {
                 String gbkString = ByteUtil.hexString2GBKString(dataString);
                 boolean isContainZH = RegularUtil.isContainChinese(gbkString);
                 if (isContainZH) {
@@ -181,33 +186,38 @@ class Iso8583Decode {
             }
             field.setDataString(dataString);
             field.setDataBytes(fieldDataBytes);
-            if (fieldLengthType > Helper.LENGTH_VAR_NONE) {
-                if (fieldDataEncode == Helper.ENCODE_BCD) {
-                    if (fieldAlignType == Helper.ALIGN_LEFT) {
-                        dataString = dataString.substring(0, fieldDataLength);
-                    } else {
-                        int length = dataString.length();
-                        dataString = dataString.substring(length - fieldDataLength, length);
-                    }
-                } else if (fieldDataEncode == Helper.ENCODE_BIT) {
-                    if (fieldAlignType == Helper.ALIGN_LEFT) {
+            // 压缩 BCD 的奇数逻辑长度会占用完整字节，需要按对齐方式去掉补入的半字节。
+            // 该规则同时适用于定长 N3（如 DE22/DE23）和变长奇数位字段（如 PAN）。
+            if (fieldDataEncode == Iso8583FieldSupport.ENCODE_BCD
+                    && dataString.length() > fieldDataLength) {
+                if (fieldAlignType == Iso8583FieldSupport.ALIGN_LEFT) {
+                    dataString = dataString.substring(0, fieldDataLength);
+                } else {
+                    int length = dataString.length();
+                    dataString = dataString.substring(length - fieldDataLength, length);
+                }
+                field.setDataString(dataString);
+            } else if (fieldLengthType > Iso8583FieldSupport.LENGTH_VAR_NONE
+                    && fieldDataEncode == Iso8583FieldSupport.ENCODE_BIT) {
+                    if (fieldAlignType == Iso8583FieldSupport.ALIGN_LEFT) {
                         dataString = dataString.substring(0, fieldDataLength * 2);
                     } else {
                         int length = dataString.length();
                         dataString = dataString.substring(length - fieldDataLength * 2, length);
                     }
-                }
                 field.setDataString(dataString);
+            }
+            if (fieldLengthType > Iso8583FieldSupport.LENGTH_VAR_NONE) {
                 field.setDataLength(fieldDataLength);
             }
             fieldMap.put(fieldName, field);
             log("| [" + fieldName + "]: [" + dataLengthString + "] " + dataString + "      [" + desc + "]");
         }
-        builder.addMessageField(fieldMap);
+        builder.fields(fieldMap);
 
         byte[] allFieldDataBytes = new byte[dataBytes.length - lengthLength - headerLength - msgTypeLength];
         System.arraycopy(dataBytes, lengthLength + headerLength + msgTypeLength, allFieldDataBytes, 0, allFieldDataBytes.length);
-        builder.addAllFieldData(allFieldDataBytes);
+        builder.allFieldData(allFieldDataBytes);
 
         log("----------------------------------------------------------------");
         log("-----------------ISO8583 decode end-----------------------------");
@@ -223,8 +233,8 @@ class Iso8583Decode {
 
     /** Detailed messages may contain card data, so logging is opt-in. */
     private static void log(String message) {
-        if (L.PRINT_DEBUG_MSG) {
-            Log.d(L.TAG, message);
+        if (Iso8583Log.ENABLED) {
+            Log.d(Iso8583Log.TAG, message);
         }
     }
 

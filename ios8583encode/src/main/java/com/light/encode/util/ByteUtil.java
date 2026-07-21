@@ -5,6 +5,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings({"CharsetObjectCanBeUsed", "unused", "StringConcatenationInLoop"})
+/**
+ * 无状态字节转换工具。
+ *
+ * <p>除名称明确包含字符集的方法外，十六进制入参必须为偶数长度且不包含空格、{@code 0x}
+ * 前缀或分隔符。输出统一使用大写十六进制。</p>
+ */
 public final class ByteUtil {
 
     private ByteUtil() {
@@ -123,7 +129,7 @@ public final class ByteUtil {
     }
 
     /**
-     * 二进制数组转换为字节数组
+     * 将 1-based 位数组转换为位图字节；索引 0 保留不用，索引 1 对应首字节最高位。
      */
     public static byte[] binaryBytes2Bytes(final boolean[] booleans) {
         int len = booleans.length - 1;
@@ -153,7 +159,7 @@ public final class ByteUtil {
     }
 
     /**
-     * 字节数组转换为二进制数组
+     * 将位图字节转换为 1-based 位数组；返回数组索引 0 固定不用。
      */
     public static boolean[] bytes2BinaryBytes(final byte[] bytes) {
         StringBuilder builder = new StringBuilder();

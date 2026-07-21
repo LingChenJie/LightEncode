@@ -46,9 +46,6 @@ android {
 }
 
 dependencies {
-    // 编解码库只需要 Gson 做通用对象克隆，不应引入整套应用架构与网络组件。
-    implementation 'com.google.code.gson:gson:2.10.1'
-
     testImplementation 'junit:junit:4.13.2'
     // AGP 7.4.x 可稳定 dex 的 AndroidX Test 版本。
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

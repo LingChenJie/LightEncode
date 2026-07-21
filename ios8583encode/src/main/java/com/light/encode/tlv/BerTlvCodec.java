@@ -1,34 +1,34 @@
 package com.light.encode.tlv;
 
-import android.util.Log;
-import com.light.encode.Pair;
 import com.light.encode.util.ByteUtil;
-import com.light.encode.util.L;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/** BER-TLV 编解码工具，支持 1～3 字节 Tag 和 definite-form Length。 */
 @SuppressWarnings("unused")
-public final class TLVHelper {
+public final class BerTlvCodec {
 
-    private TLVHelper() {
-        throw new UnsupportedOperationException("u can't instantiate me...");
+    private BerTlvCodec() {
+        throw new AssertionError("No instances");
     }
 
-    public static Map<String, TLV> builderMap(final byte[] bytes) {
+    /** 将 BER-TLV 字节流按原顺序解析为 Map；重复 Tag 仅保留最后一个值。 */
+    public static Map<String, BerTlv> decode(final byte[] bytes) {
         String hexString = ByteUtil.bytes2HexString(bytes);
-        return builderMap(hexString);
+        return decode(hexString);
     }
 
-    public static Map<String, TLV> builderMap(String hexString) {
+    /** 将不带空格的 BER-TLV 十六进制字符串解析为 Map。 */
+    public static Map<String, BerTlv> decode(String hexString) {
         if (hexString == null) {
             throw new IllegalArgumentException("TLV data cannot be null");
         }
         ByteUtil.hexString2Bytes(hexString); // 校验偶数长度及十六进制字符。
         hexString = hexString.toUpperCase(Locale.ROOT);
         int position = 0;
-        LinkedHashMap<String, TLV> map = new LinkedHashMap<>();
+        LinkedHashMap<String, BerTlv> map = new LinkedHashMap<>();
         while (hexString.length() > position) {
             // get tag
             String tag = getTag(hexString, position);
@@ -38,9 +38,9 @@ public final class TLVHelper {
             }
             position += tag.length();
             // get length
-            Pair<Integer, Integer> pair = getLength(hexString, position);
-            int length = pair.first;
-            position += pair.second;
+            LengthInfo lengthInfo = readLength(hexString, position);
+            int length = lengthInfo.valueLength;
+            position += lengthInfo.encodedChars;
             // get value
             int valueEnd = position + length * 2;
             if (valueEnd > hexString.length()) {
@@ -49,35 +49,32 @@ public final class TLVHelper {
             String value = hexString.substring(position, valueEnd);
             position += value.length();
             // create TLV
-            TLV tlv = new TLV(tag, length, value);
+            BerTlv tlv = new BerTlv(tag, length, value);
             map.put(tag, tlv);
-            //LogUtils.d(L.TAG,"| " + tag + ": " + value);
-        }
-        if (L.PRINT_DEBUG_MSG) {
-            Log.d(L.TAG,"===========================TLV-Decode-End===========================");
         }
         return map;
     }
 
-    public static String tlv2HexString(final TLV tlv) {
-        if (tlv == null || tlv.tag == null || tlv.value == null) {
+    /** 编码单个 TLV，并校验声明长度与 Value 实际字节数一致。 */
+    public static String encodeHex(final BerTlv tlv) {
+        if (tlv == null) {
             throw new IllegalArgumentException("TLV, tag and value cannot be null");
         }
-        ByteUtil.hexString2Bytes(tlv.tag);
-        int actualLength = ByteUtil.hexString2Bytes(tlv.value).length;
-        if (actualLength != tlv.length) {
+        ByteUtil.hexString2Bytes(tlv.getTag());
+        int actualLength = ByteUtil.hexString2Bytes(tlv.getValue()).length;
+        if (actualLength != tlv.getLength()) {
             throw new IllegalArgumentException("TLV length does not match value length");
         }
         StringBuilder builder = new StringBuilder();
-        String length = length2HexString(tlv.length);
-        builder.append(tlv.tag);
+        String length = encodeLengthHex(tlv.getLength());
+        builder.append(tlv.getTag());
         builder.append(length);
-        builder.append(tlv.value);
+        builder.append(tlv.getValue());
         return builder.toString();
     }
 
-    public static byte[] tlv2Bytes(final TLV tlv) {
-        String hexString = tlv2HexString(tlv);
+    public static byte[] encode(final BerTlv tlv) {
+        String hexString = encodeHex(tlv);
         return ByteUtil.hexString2Bytes(hexString);
     }
 
@@ -108,7 +105,7 @@ public final class TLVHelper {
      * 如果第一个字节的最高位b8为0, 则b7~b1的值就是value域的长度
      * 如果b8为1, b7~b1的值指示了下面有几个子字节, 下面子字节的值就是value域的长度
      */
-    private static Pair<Integer, Integer> getLength(String hexString, int position) {
+    private static LengthInfo readLength(String hexString, int position) {
         requireAvailable(hexString, position, 2, "length");
         String lengthString = hexString.substring(position, position + 2);
         int lengthValue = Integer.parseInt(lengthString, 16);
@@ -126,7 +123,7 @@ public final class TLVHelper {
             size += byteCount * 2;
         }
         int length = Integer.parseInt(lengthString, 16);
-        return new Pair<>(length, size);
+        return new LengthInfo(length, size);
     }
 
     private static void requireAvailable(String hexString, int position, int required, String part) {
@@ -138,17 +135,31 @@ public final class TLVHelper {
     /**
      * 将TLV中数据长度转化成16进制字符串
      */
-    public static String length2HexString(final int length) {
+    public static String encodeLengthHex(final int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("TLV length cannot be negative");
+        }
         if (length <= 0X7F) {
-            return String.format("%02x", length);
+            return String.format(Locale.ROOT, "%02X", length);
         } else if (length <= 0XFF) {
-            return "81" + String.format("%02x", length);
+            return "81" + String.format(Locale.ROOT, "%02X", length);
         } else if (length <= 0XFFFF) {
-            return "82" + String.format("%04x", length);
+            return "82" + String.format(Locale.ROOT, "%04X", length);
         } else if (length <= 0XFFFFFF) {
-            return "83" + String.format("%06x", length);
+            return "83" + String.format(Locale.ROOT, "%06X", length);
         } else {
-            throw new RuntimeException("TLV length error");
+            throw new IllegalArgumentException("TLV length exceeds 0xFFFFFF");
+        }
+    }
+
+    /** 长度值及其在十六进制输入中占用的字符数。 */
+    private static final class LengthInfo {
+        private final int valueLength;
+        private final int encodedChars;
+
+        private LengthInfo(int valueLength, int encodedChars) {
+            this.valueLength = valueLength;
+            this.encodedChars = encodedChars;
         }
     }
 

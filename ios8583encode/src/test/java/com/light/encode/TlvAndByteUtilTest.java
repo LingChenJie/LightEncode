@@ -1,7 +1,7 @@
 package com.light.encode;
 
-import com.light.encode.tlv.TLV;
-import com.light.encode.tlv.TLVHelper;
+import com.light.encode.tlv.BerTlv;
+import com.light.encode.tlv.BerTlvCodec;
 import com.light.encode.util.ByteUtil;
 
 import org.junit.Test;
@@ -16,17 +16,19 @@ public class TlvAndByteUtilTest {
     @Test
     public void tlvRoundTripSupportsOneAndTwoByteTags() {
         String encoded = "5A0212349F3303E0F8C8";
-        Map<String, TLV> values = TLVHelper.builderMap(encoded);
+        Map<String, BerTlv> values = BerTlvCodec.decode(encoded);
 
-        assertEquals("1234", values.get("5A").value);
-        assertEquals("E0F8C8", values.get("9F33").value);
-        assertEquals("9F3303E0F8C8", values.get("9F33").recover2HexString());
+        assertEquals("1234", values.get("5A").getValue());
+        assertEquals("E0F8C8", values.get("9F33").getValue());
+        assertEquals("9F3303E0F8C8", values.get("9F33").toHexString());
     }
 
     @Test
     public void malformedInputsFailWithClearExceptions() {
-        assertThrows(IllegalArgumentException.class, () -> TLVHelper.builderMap("5A02FF"));
-        assertThrows(IllegalArgumentException.class, () -> TLVHelper.builderMap("9F"));
+        assertThrows(IllegalArgumentException.class, () -> BerTlvCodec.decode("5A02FF"));
+        assertThrows(IllegalArgumentException.class, () -> BerTlvCodec.decode("9F"));
         assertThrows(IllegalArgumentException.class, () -> ByteUtil.hexString2Bytes("0G"));
+        assertThrows(IllegalArgumentException.class, () -> BerTlvCodec.encodeLengthHex(-1));
+        assertThrows(IllegalArgumentException.class, () -> new BerTlv("5A", 2, "12"));
     }
 }

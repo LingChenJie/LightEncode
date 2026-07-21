@@ -9,12 +9,11 @@
     <string name="step_two">2</string>
 
     <string name="section_encode">配置与组包</string>
-    <string name="section_encode_hint">选择字段规范和交易预置，再按域号编辑数据。Bitmap 与字段顺序由核心库自动生成。</string>
+    <string name="section_encode_hint">选择消费场景，再按域号编辑数据。示例使用 BCD MTI/数值域、ASCII 文本域和 BIT 二进制域，Bitmap 与字段顺序自动生成。</string>
     <string name="section_decode">原始报文解包</string>
     <string name="section_decode_hint">粘贴连续或带空格的 HEX 报文，设置渠道封装长度后查看 MTI、Bitmap 和各数据域。</string>
 
-    <string name="label_profile">字段规范</string>
-    <string name="label_preset">交易预置</string>
+    <string name="label_preset">消费报文场景</string>
     <string name="label_header">TPDU / Header（HEX）</string>
     <string name="label_header_length">Header 长度（bytes）</string>
     <string name="label_length_bytes">Length 长度（bytes）</string>
@@ -39,7 +38,6 @@
     <string name="action_show_sensitive">显示敏感域</string>
 
     <string name="status_ready">● 就绪 · 等待输入</string>
-    <string name="status_profile_loaded">● 已加载 %1$s</string>
     <string name="status_preset_loaded">● 已载入 %1$s 示例</string>
     <string name="status_encoded">● 组包成功 · %1$d 字节</string>
     <string name="status_decoded">● 解包成功 · %1$d 个数据域</string>
